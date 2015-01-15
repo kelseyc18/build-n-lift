@@ -1,5 +1,99 @@
 #include<math.h>
 
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+
+// Pulse width min/max for servos
+
+
+
+// Direction constants
+#define XDIR 0;
+#define YDIR 1;
+#define ZDIR 2;
+
+// Pin inputs and outputs
+const int analogInPin1 = A0;  	// Analog input pin that EMG-1 is attached to
+const int analogInPin2 = A1;	// Analog input pin that EMG-2 is attached to
+const int analogInPin3 = A2;	// Analog input pin that EMG-3 is attached to
+
+const int buttonX = 2;	// Digital input pin for X direction
+const int buttonY = 4;	// Digital input pin for Y direction
+const int buttonZ = 7;	// Digital input pin for Z direction
+
+// Sensor values
+int sensorValue1 = 0;
+int sensorValue2 = 0;
+int sensorValue3 = 0;
+
+// Button values
+int xDir = 0;
+int yDir = 0;
+int zDir = 0;
+
+// Thresholds
+int xThresh = 500;
+int yThresh = 500;
+int zThresh = 500;
+
+void setup()
+{
+  Serial.begin(115200);
+}
+
+void loop()
+{
+  // Link EMG voltage to velocity
+	
+  // get EMG sensor values
+  sensorValue1 = analogRead(analogInPin1);
+  sensorValue2 = analogRead(analogInPin2);
+  sensorValue3 = analogRead(analogInPin3);
+	
+  // get direction of XYZ movement
+  // 0: neg. direction
+  // 1: pos. direction
+  xDir = digitalRead(buttonX);
+  yDir = digitalRead(buttonY);
+  zDir = digitalRead(buttonZ);
+	
+  // compare sensor values with threshold and take corresponding action
+  checkThresh(sensorValue1, xThresh, XDIR, xDir);
+  checkThresh(sensorValue2, yThresh, YDIR, yDir);
+  checkThresh(sensorValue3, zThresh, ZDIR, zDir);
+}
+
+/*
+This function compares a given value to the threshold value. If the value is
+larger than the threshold, the robot arm will move in the indicated direction.
+Otherwise, the robot arm will stop moving in the indicated direction.
+*/
+void checkThresh(int value, int thresh, int direction, int posNeg)
+{
+  if (value > thresh) {
+    if (posNeg) {
+      // move at certain velocity in positive indicated direction 
+    }
+    else {
+      // move at certain velocity in negative indicated direction
+    }
+  }
+  else {
+    // stop moving in indicated direction
+    stop(direction);
+  }
+}
+
+/*
+This function stops the robot arm from moving in the indicated direction.
+*/
+void stop(int direction)
+{
+  // stop moving in indicated direction
+}
+
 /*
 Daniel's Inverse Kinematics math
 */

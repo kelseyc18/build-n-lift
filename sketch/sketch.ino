@@ -92,6 +92,10 @@ void stop(int direction)
 {
   // stop moving in indicated direction
 }
+// checking
+//work pls
+#is this a comment?
+/*this?*/
 
 /*
 Daniel's Inverse Kinematics math

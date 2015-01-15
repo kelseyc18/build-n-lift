@@ -94,7 +94,7 @@ void stop(int direction)
 }
 // checking
 //work pls
-#is this a comment?
+// "lion king noises"
 /*this?*/
 
 /*
@@ -122,4 +122,4 @@ theta3 = acos((length4^2 - length5^2 - length2^2)/(-2*length5*length2) + phi2; /
 float theta4 = atan2(z-length1, r); // angle from horizontal to end effector
 float theta5 = acos((length5^2 - length2^2 - length4^2)/(-2*length2*length4); // angle from theta4 to humerus
 theta2 =theta4 +theta5; // adding to get theta 2
-
+// I am Africa

@@ -74,7 +74,7 @@ int checkThresh (int value, int posNeg, int wristTrue, int portnum, int pos, int
         pos-= 5;
       }
        else{
-         pwm.setPWM(portnum, 0, pos);
+         pwm.setPWM(portnum, 2000, pos+2000);
        }
     }
     else{
@@ -83,11 +83,12 @@ int checkThresh (int value, int posNeg, int wristTrue, int portnum, int pos, int
         pos+= 5;
       }
       else{
-        pwm.setPWM(portnum, 0, pos);
+        pwm.setPWM(portnum, 2000, pos+2000);
       }
     }
   }
   }
+  delay(50);
   return pos;
   }
     

@@ -26,6 +26,11 @@ int wristAngPort = 0;
 int wristRotPort = 1;
 int clawPosPort = 2;
 
+// Remaining servo outputs
+int base_Rotation = 3
+int shoulder_Servo = 4
+int elbow_Servo = 5
+
 // XYZ velocity increments
 const int incX = 5;
 const int incY = 5;

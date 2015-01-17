@@ -26,11 +26,6 @@ const int SHOULDER_MAX = 500; // guess
 // temp
 int servo_test_port = 0;
 
-// Direction constants
-#define XDIR 0;
-#define YDIR 1;
-#define ZDIR 2;
-
 // Pin inputs and outputs
 const int analogInPin1 = A0;  	// Analog input pin that EMG-1 is attached to
 const int analogInPin2 = A1;	// Analog input pin that EMG-2 is attached to
@@ -169,6 +164,10 @@ void updateVelocities()
   else velZ = 0;
 }
 
+/* 
+Daniel, I think it might help to use the degreesToPulse() method to find 
+out how much you need to increase the pulse length by in order to change the angle.
+*/
 int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int thismax)
 {
   if (value > threshhold){
@@ -202,17 +201,19 @@ int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int this
 // haha this is great, Daniel. it's Daniel, right? otherwise, hi, Bernard.
 
 /*
-Daniel's Inverse Kinematics math
+This method sets the servo angles so that the end effector is at the given position (in xyz coordinates).
 */
-// FYI, Daniel, Arduino doesn't recognize '^' as an exponent. If you want to calculate the square of 3, you would use 'pow(3.0, 2.0)'
-// http://arduino.cc/en/Reference/Pow
 void moveToPosition(int x, int y, int z) {
   calculateDegrees(x, y, z); // updates desiredDegrees
   pwm.setPWM(basePort, 0, degreesToPulse(desiredDegrees[0], BASE_ROTATION_MIN, BASE_ROTATION_MAX));
-  pwm.setPWM(shoulderPort, 0, degreesToPulse(desiredDegrees[0], SHOULDER_MIN, SHOULDER_MAX));
-  pwm.setPWM(elbowPort, 0, degreesToPulse(desiredDegrees[0], ELBOW_MIN, ELBOW_MAX));
+  pwm.setPWM(shoulderPort, 0, degreesToPulse(desiredDegrees[1], SHOULDER_MIN, SHOULDER_MAX));
+  pwm.setPWM(elbowPort, 0, degreesToPulse(desiredDegrees[2], ELBOW_MIN, ELBOW_MAX));
 }
 
+/*
+This method uses inverse kinematics to determine the desired angles of the servos given
+a desired xyz coordinate position.
+*/
 void calculateDegrees (int x, int y, int z) {
   desiredDegrees[0] = 0; // desired base angle
   desiredDegrees[1] = 0; // desired shoulder angle
@@ -232,16 +233,19 @@ void calculateDegrees (int x, int y, int z) {
   float theta3 = 0; // angle of the servo at the elbow, between wrist and shoulder
   r = sqrt(pow(x, 2.0) +pow(y, 2.0)); // pythagoras
   theta1 = atan2(y,x); // trig
-  //float length5 = sqrt(pow(length3,2.0) + ro^2 - 2*length3*ro*cos(180-phi)); // law of cosines to find the length from the wrist to the end effector
-  //float phi2 = acos((pow(-ro,2.0) - pow(length5,2.0) + pow(length3, 2.0))/(-2*length5*length3)); //angle from wrist-elbow-end effector
-  //float length4 = sqrt(pow(r,2.0) + pow(z-length1,2.0); // length from shoulder to end effector
-  //theta3 = acos((pow(length4,2.0) - pow(legnth5,2.0) - pow(length2,2.0))/(-2*length5*length2) + phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
-  //float theta4 = atan2(z-length1, r); // angle from horizontal to end effector
-  //float theta5 = acos((pow(length5,2.0) - pow(length2,2.0) - pow(length4,2.0)/(-2*length2*length4); // angle from theta4 to humerus
-  //theta2 =theta4 +theta5; // adding to get theta 2
+  float length5 = sqrt(pow(length3,2.0) + pow(ro,2.0) - 2*length3*ro*cos(180-phi)); // law of cosines to find the length from the wrist to the end effector
+  float phi2 = acos((pow(-ro,2.0) - pow(length5,2.0) + pow(length3, 2.0))/(-2*length5*length3)); //angle from wrist-elbow-end effector
+  float length4 = sqrt(pow(r,2.0) + pow(z-length1,2.0)); // length from shoulder to end effector
+  theta3 = acos((pow(length4,2.0) - pow(length5,2.0) - pow(length2,2.0))/(-2*length5*length2)) + phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
+  float theta4 = atan2(z-length1, r); // angle from horizontal to end effector
+  float theta5 = acos((pow(length5,2.0) - pow(length2,2.0) - pow(length4,2.0))/(-2*length2*length4)); // angle from theta4 to humerus
+  theta2 =theta4 +theta5; // adding to get theta 2
   // I am Africa
 }
 
+/*
+This method converts a desired angle in degrees to the corresponding desired pulse length.
+*/
 int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
   int pulse_length;
   if(angle_Degree > 180){

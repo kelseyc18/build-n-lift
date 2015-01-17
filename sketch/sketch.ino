@@ -76,9 +76,6 @@ int wristAng = 350;
 int wristRot = 300;
 int clawPos = 370;
 
-int negPos;
-int wrist;
-
 void setup()
 {
   Serial.begin(115200);

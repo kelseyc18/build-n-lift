@@ -83,7 +83,7 @@ void setup()
 {
   Serial.begin(115200);
   pwm.begin();
-  pwm.setPWMFreq(1600);
+  pwm.setPWMFreq(60); // max frequency is 1000 Hz
   
   //Setting all to middle, can do starting value if we want
   pwm.setPWM(wristAngPort, 0, wristAng);

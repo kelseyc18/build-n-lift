@@ -31,6 +31,9 @@ const int incX = 5;
 const int incY = 5;
 const int incZ = 5;
 
+// wrist increments
+const int incWrist = 5;
+
 // Sensor values
 int sensorValue1 = 0;
 int sensorValue2 = 0;
@@ -75,6 +78,9 @@ int clawPosMax = 600;
 int wristAng = 350;
 int wristRot = 300;
 int clawPos = 370;
+
+// pulse constants
+int pulseOn = 2000;
 
 void setup()
 {
@@ -152,21 +158,21 @@ int moveWrist(int value, int posNeg, int wristTrue, int portnum, int pos, int th
   if (value > threshhold){
     if (wristTrue){
       if (posNeg){
-        pos += 5;
+        pos += incWrist;
         if (pos > thismax){
-          pos-= 5;
+          pos-= incWrist;
         }
         else{
-          pwm.setPWM(portnum, 2000, pos+2000);
+          pwm.setPWM(portnum, pulseOn, pos + pulseOn);
         }
       }
       else{
-        pos-=5;
+        pos -= incWrist;
         if(pos < thismin){
-          pos+= 5;
+          pos += incWrist;
         }
         else{
-          pwm.setPWM(portnum, 2000, pos+2000);
+          pwm.setPWM(portnum, pulseOn, pos + pulseOn);
         }
       }
     }

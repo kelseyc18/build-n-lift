@@ -5,19 +5,22 @@
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 //Pulse Ranges for Joint servos
-#define const int BASE_ROTATION_MIN = 150;
-#define const int BASE_ROTATION_MAX = 600;
+const int BASE_ROTATION_MIN = 150;
+const int BASE_ROTATION_MAX = 600;
 
-#define const int WRIST_ANGLE_MIN = 100;
-#define const int WRIST_ANGLE_MAX = 585;
+const int WRIST_ANGLE_MIN = 100;
+const int WRIST_ANGLE_MAX = 585;
 
-#define const int WRIST_GRIPPER_MIN = 150;
-#define const int WRIST_GRIPPER_MAX = 600;
+const int WRIST_GRIPPER_MIN = 150;
+const int WRIST_GRIPPER_MAX = 600;
 
-//#define const int ELBOW_MIN
-//#define const int ELBOW_MAX
-//#define const int SHOULDER_MIN
-//#define const int SHOULDER_MAX
+const int WRIST_ROT_MIN = 200; //guess
+const int WRIST_ROT_MAX = 400; // guess
+
+//const int ELBOW_MIN
+//const int ELBOW_MAX
+//const int SHOULDER_MIN
+//const int SHOULDER_MAX
 
 // temp
 int servo_test_port = 0;
@@ -38,12 +41,12 @@ const int modeButton = 4;       // Digital input pin to toggle mode (xyz directi
 // Wrist outputs
 int wristAngPort = 0;
 int wristRotPort = 1;
-int clawPosPort = 2;
+int wristGripperPort = 2;
 
 // Remaining servo outputs
-int base_Rotation = 3
-int shoulder_Servo = 4
-int elbow_Servo = 5
+int basePort = 3;
+int shoulderPort = 4;
+int elbowPort = 5;
 
 // XYZ velocity increments
 const int incX = 5;
@@ -83,23 +86,16 @@ boolean moveX = false;
 boolean moveY = false;
 boolean moveZ = false;
 
-// wrist servo min
-int WRIST_ANGLE_MIN = 100;
-int WRIST_ROT_MIN = 200; //guess
-int WRIST_GRIPPER_MIN = 150;
-
-// wrist servo max
-int WRIST_ANGLE_MAX = 585;
-int WRIST_ROT_MAX = 400; //guess
-int WRIST_GRIPPER_MAX = 600;
-
 // current servo value
 int wristAng = 350;
 int wristRot = 300;
-int clawPos = 370;
+int wristGripper = 370;
 
 // pulse constants
 int pulseOn = 2000;
+
+// desired angles for inverse kinematics
+int desiredDegrees[] = {0, 0, 0};
 
 void setup()
 {
@@ -110,7 +106,7 @@ void setup()
   // Setting all to middle, can do starting value if we want
   pwm.setPWM(wristAngPort, 0, degreesToPulse(90, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
   pwm.setPWM(wristRotPort, 0, degreesToPulse(90, WRIST_ROT_MIN, WRIST_ROT_MAX));
-  pwm.setPWM(clawPosPort, 0, degreesToPulse(90, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));
+  pwm.setPWM(wristGripperPort, 0, degreesToPulse(90, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));
 }
 
 void loop()
@@ -138,7 +134,7 @@ void loop()
     // move wrist servos
     wristAng = moveWrist(sensorValue1, dirValue, wristAngPort, wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
     wristRot = moveWrist(sensorValue2, dirValue, wristRotPort, wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX);
-    clawPos = moveWrist(sensorValue3, dirValue, clawPosPort, clawPos, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX);
+    wristGripper = moveWrist(sensorValue3, dirValue, wristGripperPort, wristGripper, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX);
   }
   else
   {
@@ -210,16 +206,17 @@ Daniel's Inverse Kinematics math
 // FYI, Daniel, Arduino doesn't recognize '^' as an exponent. If you want to calculate the square of 3, you would use 'pow(3.0, 2.0)'
 // http://arduino.cc/en/Reference/Pow
 void moveToPosition(int x, int y, int z) {
-  int[3] desiredDegrees = [0, 0, 0];
-  calculateDegrees(x, y, z, desiredDegrees);
-  setPWM()
+  
+  calculateDegrees(x, y, z); // updates desiredDegrees
+  pwm.setPWM(basePort, 0, degreesToPulse(desiredDegrees[0], BASE_ROTATION_MIN, BASE_ROTATION_MAX));
+  pwm.setPWM(shoulderPort, 0, degreesToPulse(desiredDegrees[0], 0, 0));
+  pwm.setPWM(elbowPort, 0, degreesToPulse(desiredDegrees[0], 0, 0));
 }
 
-void calculateDegrees (int x, int y, int z, int[] desiredDegrees) {
+void calculateDegrees (int x, int y, int z) {
   desiredDegrees[0] = 0;
   desiredDegrees[1] = 0;
   desiredDegrees[2] = 0;
-}
   const float pi = 3.14159265259;
 //  int x = 2; // x we give
 //  int y = 2; // y we give
@@ -233,8 +230,8 @@ void calculateDegrees (int x, int y, int z, int[] desiredDegrees) {
   float theta1 = 0;  // base angle
   float theta2 = 0; // angle of the servo at the shoulder, from horizontal
   float theta3 = 0; // angle of the servo at the elbow, between wrist and shoulder
-  r = sqrt(pow(x, 2.0) +pow(y, 2.0)); // pythagoras
-  theta1 = atan2(y,x); // trig
+  // r = sqrt(pow(x, 2.0) +pow(y, 2.0)); // pythagoras
+  // theta1 = atan2(y,x); // trig
 //  float length5 = sqrt(length3^2 + ro^2 - 2*length3*ro*cos(180-phi)); // law of cosines to find the length from the wrist to the end effector
 //  float phi2 = acos((-ro^2 - length5^2 + length3^2)/(-2*length5*length3)); //angle from wrist-elbow-end effector
 //  float length4 = sqrt(r^2 + (z- length1)^2); // length from shoulder to end effector

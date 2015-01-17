@@ -19,7 +19,12 @@ const int analogInPin2 = A1;	// Analog input pin that EMG-2 is attached to
 const int analogInPin3 = A2;	// Analog input pin that EMG-3 is attached to
 
 const int dirButton = 2;	// Digital input pin indicating positive or negative direction
-const int modeButton = 4;       // Digital input pin to toggle mode (xyz direction or 
+const int modeButton = 4;       // Digital input pin to toggle mode (xyz direction or wrist movement)
+
+// XYZ velocity increments
+const int incX = 5;
+const int incY = 5;
+const int incZ = 5;
 
 // Sensor values
 int sensorValue1 = 0;
@@ -39,6 +44,16 @@ int zThresh = 500;
 int currentX = 0;
 int currentY = 0;
 int currentZ = 0;
+
+// Current XYZ velocity
+int velX = 0;
+int velY = 0;
+int velZ = 0;
+
+// Move in direction
+boolean moveX = false;
+boolean moveY = false;
+boolean moveZ = false;
 
 void setup()
 {
@@ -72,39 +87,33 @@ void loop()
   else
   {
     // move xyz servos
-    checkThresh(sensorValue1, xThresh, XDIR);
-    checkThresh(sensorValue2, yThresh, YDIR);
-    checkThresh(sensorValue3, zThresh, ZDIR);
+    // check thresholds
+    moveX = checkThresh(sensorValue1, xThresh);
+    moveY = checkThresh(sensorValue2, yThresh);
+    moveZ = checkThresh(sensorValue3, zThresh);
+    // update velocities
+    updateVelocities();
+    if (dirValue) moveToPosition(currentX + velX, currentY + velY, currentZ + velZ);
+    else moveToPosition(currentX - velX, currentY - velY, currentZ - velZ);
   }
 }
 
 /*
-This function compares a given value to the threshold value. If the value is
-larger than the threshold, the robot arm will move in the indicated direction.
-Otherwise, the robot arm will stop moving in the indicated direction.
+This function returns True if the sensor value is greater than the threshold value.
 */
-void checkThresh(int value, int thresh, int dir)
+boolean checkThresh(int sensor, int thresh)
 {
-  if (value > thresh) {
-    if (dirValue) {
-      // move at certain velocity in positive indicated direction 
-    }
-    else {
-      // move at certain velocity in negative indicated direction
-    }
-  }
-  else {
-    // stop moving in indicated direction
-    stop(dir);
-  }
+  return sensor > thresh; 
 }
 
-/*
-This function stops the robot arm from moving in the indicated direction.
-*/
-void stop(int dir)
+void updateVelocities()
 {
-  // stop moving in indicated direction
+  if (moveX) velX = incX;
+  else velX = 0;
+  if (moveY) velY = incY;
+  else velY = 0;
+  if (moveZ) velZ = incZ;
+  else velZ = 0;
 }
 
 // checking
@@ -116,8 +125,10 @@ void stop(int dir)
 /*
 Daniel's Inverse Kinematics math
 */
+// FYI, Daniel, Arduino doesn't recognize '^' as an exponent. If you want to calculate the square of 3, you would use 'pow(3.0, 2.0)'
+// http://arduino.cc/en/Reference/Pow
 void moveToPosition(int x, int y, int z) {
-  const float pi = 3.14159265259
+  const float pi = 3.14159265259;
 //  int x = 2; // x we give
 //  int y = 2; // y we give
 //  int z = 2; // z we give
@@ -130,14 +141,14 @@ void moveToPosition(int x, int y, int z) {
   float theta1 = 0;  // base angle
   float theta2 = 0; // angle of the servo at the shoulder, from horizontal
   float theta3 = 0; // angle of the servo at the elbow, between wrist and shoulder
-  r = sqrt(x^2 +y^2); // pythagoras
+  r = sqrt(pow(x, 2.0) +pow(y, 2.0)); // pythagoras
   theta1 = atan2(y,x); // trig
-  float length5 = sqrt(length3^2 + ro^2 - 2*length3*ro*cos(180-phi)); // law of cosines to find the length from the wrist to the end effector
-  float phi2 = acos((-ro^2 - length5^2 + length3^2)/(-2*length5*length3)); //angle from wrist-elbow-end effector
-  float length4 = sqrt(r^2 + (z- length1)^2); // length from shoulder to end effector
-  theta3 = acos((length4^2 - length5^2 - length2^2)/(-2*length5*length2) + phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
-  float theta4 = atan2(z-length1, r); // angle from horizontal to end effector
-  float theta5 = acos((length5^2 - length2^2 - length4^2)/(-2*length2*length4); // angle from theta4 to humerus
-  theta2 =theta4 +theta5; // adding to get theta 2
+//  float length5 = sqrt(length3^2 + ro^2 - 2*length3*ro*cos(180-phi)); // law of cosines to find the length from the wrist to the end effector
+//  float phi2 = acos((-ro^2 - length5^2 + length3^2)/(-2*length5*length3)); //angle from wrist-elbow-end effector
+//  float length4 = sqrt(r^2 + (z- length1)^2); // length from shoulder to end effector
+//  theta3 = acos((length4^2 - length5^2 - length2^2)/(-2*length5*length2) + phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
+//  float theta4 = atan2(z-length1, r); // angle from horizontal to end effector
+//  float theta5 = acos((length5^2 - length2^2 - length4^2)/(-2*length2*length4); // angle from theta4 to humerus
+//  theta2 =theta4 +theta5; // adding to get theta 2
   // I am Africa
 }

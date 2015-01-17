@@ -21,6 +21,11 @@ const int analogInPin3 = A2;	// Analog input pin that EMG-3 is attached to
 const int dirButton = 2;	// Digital input pin indicating positive or negative direction
 const int modeButton = 4;       // Digital input pin to toggle mode (xyz direction or wrist movement)
 
+// Wrist outputs
+int wristAngPort = 0;
+int wristRotPort = 1;
+int clawPosPort = 2;
+
 // XYZ velocity increments
 const int incX = 5;
 const int incY = 5;
@@ -39,6 +44,7 @@ int modeValue = 0;
 int xThresh = 500;
 int yThresh = 500;
 int zThresh = 500;
+int threshhold = 250;  // for wrist
 
 // Current XYZ position
 int currentX = 0;
@@ -55,9 +61,35 @@ boolean moveX = false;
 boolean moveY = false;
 boolean moveZ = false;
 
+// wrist servo min
+int wristAngMin = 100;
+int wristRotMin = 200; //guess
+int clawPosMin = 150;
+
+// wrist servo max
+int wristAngMax = 585;
+int wristRotMax = 400; //guess
+int clawPosMax = 600;
+
+// current servo angles
+int wristAng = 350;
+int wristRot = 300;
+int clawPos = 370;
+
+int negPos;
+int wrist;
+
 void setup()
 {
   Serial.begin(115200);
+  pwm.begin();
+  pwm.setPWMFreq(1600);
+  
+  if(buttonWrist){ //Setting all to middle, can do starting value if we want
+    pwm.setPWM(wristAngPort, 0, wristAng);
+    pwm.setPWM(wristRotPort, 0, wristRot);
+    pwm.setPWM(clawPosPort, 0, clawPos);
+  }
 }
 
 void loop()
@@ -83,6 +115,9 @@ void loop()
   if (modeValue)
   {
     // move wrist servos
+    wristAng = moveWrist(sensorValue1, dirValue, modeValue, wristAngPort, wristAng, wristAngMin, wristAngMax);
+    wristRot = moveWrist(sensorValue2, dirValue, modeValue, wristRotPort, wristRot, wristRotMin, wristRotMax);
+    clawPos = moveWrist(sensorValue3, dirValue, modeValue, clawPosPort, clawPos, clawPosMin, clawPosMax);
   }
   else
   {
@@ -116,6 +151,34 @@ void updateVelocities()
   else velZ = 0;
 }
 
+int moveWrist(int value, int posNeg, int wristTrue, int portnum, int pos, int thismin, int thismax)
+{
+  if (value > threshhold){
+    if (wristTrue){
+      if (posNeg){
+        pos += 5;
+        if (pos > thismax){
+          pos-= 5;
+        }
+        else{
+          pwm.setPWM(portnum, 2000, pos+2000);
+        }
+      }
+      else{
+        pos-=5;
+        if(pos < thismin){
+          pos+= 5;
+        }
+        else{
+          pwm.setPWM(portnum, 2000, pos+2000);
+        }
+      }
+    }
+  }
+  delay(50);
+  return pos;
+}
+  
 // checking
 //work pls
 // "lion king noises"

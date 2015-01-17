@@ -17,10 +17,11 @@ const int WRIST_GRIPPER_MAX = 600;
 const int WRIST_ROT_MIN = 200; //guess
 const int WRIST_ROT_MAX = 400; // guess
 
-//const int ELBOW_MIN
-//const int ELBOW_MAX
-//const int SHOULDER_MIN
-//const int SHOULDER_MAX
+const int ELBOW_MIN = 100; // guess
+const int ELBOW_MAX = 500; // guess
+
+const int SHOULDER_MIN = 100; // guess
+const int SHOULDER_MAX = 500; // guess
 
 // temp
 int servo_test_port = 0;
@@ -206,17 +207,16 @@ Daniel's Inverse Kinematics math
 // FYI, Daniel, Arduino doesn't recognize '^' as an exponent. If you want to calculate the square of 3, you would use 'pow(3.0, 2.0)'
 // http://arduino.cc/en/Reference/Pow
 void moveToPosition(int x, int y, int z) {
-  
   calculateDegrees(x, y, z); // updates desiredDegrees
   pwm.setPWM(basePort, 0, degreesToPulse(desiredDegrees[0], BASE_ROTATION_MIN, BASE_ROTATION_MAX));
-  pwm.setPWM(shoulderPort, 0, degreesToPulse(desiredDegrees[0], 0, 0));
-  pwm.setPWM(elbowPort, 0, degreesToPulse(desiredDegrees[0], 0, 0));
+  pwm.setPWM(shoulderPort, 0, degreesToPulse(desiredDegrees[0], SHOULDER_MIN, SHOULDER_MAX));
+  pwm.setPWM(elbowPort, 0, degreesToPulse(desiredDegrees[0], ELBOW_MIN, ELBOW_MAX));
 }
 
 void calculateDegrees (int x, int y, int z) {
-  desiredDegrees[0] = 0;
-  desiredDegrees[1] = 0;
-  desiredDegrees[2] = 0;
+  desiredDegrees[0] = 0; // desired base angle
+  desiredDegrees[1] = 0; // desired shoulder angle
+  desiredDegrees[2] = 0; // desired elbow angle
   const float pi = 3.14159265259;
 //  int x = 2; // x we give
 //  int y = 2; // y we give

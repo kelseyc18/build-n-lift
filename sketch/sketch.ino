@@ -85,11 +85,10 @@ void setup()
   pwm.begin();
   pwm.setPWMFreq(1600);
   
-  if(buttonWrist){ //Setting all to middle, can do starting value if we want
-    pwm.setPWM(wristAngPort, 0, wristAng);
-    pwm.setPWM(wristRotPort, 0, wristRot);
-    pwm.setPWM(clawPosPort, 0, clawPos);
-  }
+  //Setting all to middle, can do starting value if we want
+  pwm.setPWM(wristAngPort, 0, wristAng);
+  pwm.setPWM(wristRotPort, 0, wristRot);
+  pwm.setPWM(clawPosPort, 0, clawPos);
 }
 
 void loop()

@@ -235,13 +235,13 @@ void calculateDegrees (int x, int y, int z, int[] desiredDegrees) {
   float theta3 = 0; // angle of the servo at the elbow, between wrist and shoulder
   r = sqrt(pow(x, 2.0) +pow(y, 2.0)); // pythagoras
   theta1 = atan2(y,x); // trig
-//  float length5 = sqrt(length3^2 + ro^2 - 2*length3*ro*cos(180-phi)); // law of cosines to find the length from the wrist to the end effector
-//  float phi2 = acos((-ro^2 - length5^2 + length3^2)/(-2*length5*length3)); //angle from wrist-elbow-end effector
-//  float length4 = sqrt(r^2 + (z- length1)^2); // length from shoulder to end effector
-//  theta3 = acos((length4^2 - length5^2 - length2^2)/(-2*length5*length2) + phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
-//  float theta4 = atan2(z-length1, r); // angle from horizontal to end effector
-//  float theta5 = acos((length5^2 - length2^2 - length4^2)/(-2*length2*length4); // angle from theta4 to humerus
-//  theta2 =theta4 +theta5; // adding to get theta 2
+  //float length5 = sqrt(pow(length3,2.0) + ro^2 - 2*length3*ro*cos(180-phi)); // law of cosines to find the length from the wrist to the end effector
+  //float phi2 = acos((pow(-ro,2.0) - pow(length5,2.0) + pow(length3, 2.0))/(-2*length5*length3)); //angle from wrist-elbow-end effector
+  //float length4 = sqrt(pow(r,2.0) + pow(z-length1,2.0); // length from shoulder to end effector
+  //theta3 = acos((pow(length4,2.0) - pow(legnth5,2.0) - pow(length2,2.0))/(-2*length5*length2) + phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
+  //float theta4 = atan2(z-length1, r); // angle from horizontal to end effector
+  //float theta5 = acos((pow(length5,2.0) - pow(length2,2.0) - pow(length4,2.0)/(-2*length2*length4); // angle from theta4 to humerus
+  //theta2 =theta4 +theta5; // adding to get theta 2
   // I am Africa
 }
 

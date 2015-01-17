@@ -210,6 +210,16 @@ Daniel's Inverse Kinematics math
 // FYI, Daniel, Arduino doesn't recognize '^' as an exponent. If you want to calculate the square of 3, you would use 'pow(3.0, 2.0)'
 // http://arduino.cc/en/Reference/Pow
 void moveToPosition(int x, int y, int z) {
+  int[3] desiredDegrees = [0, 0, 0];
+  calculateDegrees(x, y, z, desiredDegrees);
+  setPWM()
+}
+
+void calculateDegrees (int x, int y, int z, int[] desiredDegrees) {
+  desiredDegrees[0] = 0;
+  desiredDegrees[1] = 0;
+  desiredDegrees[2] = 0;
+}
   const float pi = 3.14159265259;
 //  int x = 2; // x we give
 //  int y = 2; // y we give

@@ -4,9 +4,23 @@
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
-// Pulse width min/max for servos
-// Bernard was here
+//Pulse Ranges for Joint servos
+#define const int BASE_ROTATION_MIN = 150;
+#define const int BASE_ROTATION_MAX = 600;
 
+#define const int WRIST_ANGLE_MIN = 100;
+#define const int WRIST_ANGLE_MAX = 585;
+
+#define const int WRIST_GRIPPER_MIN = 150;
+#define const int WRIST_GRIPPER_MAX = 600;
+
+//#define const int ELBOW_MIN
+//#define const int ELBOW_MAX
+//#define const int SHOULDER_MIN
+//#define const int SHOULDER_MAX
+
+// temp
+int servo_test_port = 0;
 
 // Direction constants
 #define XDIR 0;
@@ -70,16 +84,16 @@ boolean moveY = false;
 boolean moveZ = false;
 
 // wrist servo min
-int wristAngMin = 100;
-int wristRotMin = 200; //guess
-int clawPosMin = 150;
+int WRIST_ANGLE_MIN = 100;
+int WRIST_ROT_MIN = 200; //guess
+int WRIST_GRIPPER_MIN = 150;
 
 // wrist servo max
-int wristAngMax = 585;
-int wristRotMax = 400; //guess
-int clawPosMax = 600;
+int WRIST_ANGLE_MAX = 585;
+int WRIST_ROT_MAX = 400; //guess
+int WRIST_GRIPPER_MAX = 600;
 
-// current servo angles
+// current servo value
 int wristAng = 350;
 int wristRot = 300;
 int clawPos = 370;
@@ -93,10 +107,10 @@ void setup()
   pwm.begin();
   pwm.setPWMFreq(60); // max frequency is 1000 Hz
   
-  //Setting all to middle, can do starting value if we want
-  pwm.setPWM(wristAngPort, 0, wristAng);
-  pwm.setPWM(wristRotPort, 0, wristRot);
-  pwm.setPWM(clawPosPort, 0, clawPos);
+  // Setting all to middle, can do starting value if we want
+  pwm.setPWM(wristAngPort, 0, degreesToPulse(90, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
+  pwm.setPWM(wristRotPort, 0, degreesToPulse(90, WRIST_ROT_MIN, WRIST_ROT_MAX));
+  pwm.setPWM(clawPosPort, 0, degreesToPulse(90, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));
 }
 
 void loop()
@@ -122,9 +136,9 @@ void loop()
   if (modeValue)
   {
     // move wrist servos
-    wristAng = moveWrist(sensorValue1, dirValue, modeValue, wristAngPort, wristAng, wristAngMin, wristAngMax);
-    wristRot = moveWrist(sensorValue2, dirValue, modeValue, wristRotPort, wristRot, wristRotMin, wristRotMax);
-    clawPos = moveWrist(sensorValue3, dirValue, modeValue, clawPosPort, clawPos, clawPosMin, clawPosMax);
+    wristAng = moveWrist(sensorValue1, dirValue, wristAngPort, wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
+    wristRot = moveWrist(sensorValue2, dirValue, wristRotPort, wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX);
+    clawPos = moveWrist(sensorValue3, dirValue, clawPosPort, clawPos, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX);
   }
   else
   {
@@ -158,27 +172,25 @@ void updateVelocities()
   else velZ = 0;
 }
 
-int moveWrist(int value, int posNeg, int wristTrue, int portnum, int pos, int thismin, int thismax)
+int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int thismax)
 {
   if (value > threshhold){
-    if (wristTrue){
-      if (posNeg){
-        pos += incWrist;
-        if (pos > thismax){
-          pos-= incWrist;
-        }
-        else{
-          pwm.setPWM(portnum, pulseOn, pos + pulseOn);
-        }
+    if (posNeg){
+      pos += incWrist;
+      if (pos > thismax){
+        pos-= incWrist;
       }
       else{
-        pos -= incWrist;
-        if(pos < thismin){
-          pos += incWrist;
-        }
-        else{
-          pwm.setPWM(portnum, pulseOn, pos + pulseOn);
-        }
+        pwm.setPWM(portnum, pulseOn, pos + pulseOn);
+      }
+    }
+    else{
+      pos -= incWrist;
+      if(pos < thismin){
+        pos += incWrist;
+      }
+      else{
+        pwm.setPWM(portnum, pulseOn, pos + pulseOn);
       }
     }
   }
@@ -221,4 +233,16 @@ void moveToPosition(int x, int y, int z) {
 //  float theta5 = acos((length5^2 - length2^2 - length4^2)/(-2*length2*length4); // angle from theta4 to humerus
 //  theta2 =theta4 +theta5; // adding to get theta 2
   // I am Africa
+}
+
+int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
+  int pulse_length;
+  if(angle_Degree > 180){
+      pulse_length = map(angle_Degree, 0, 360, pulseMin, pulseMax);
+   }
+  else if (angle_Degree < 180){
+      pulse_length = map(angle_Degree, 0, 180, pulseMin, pulseMax);
+    }
+  
+  return pulse_length;
 }

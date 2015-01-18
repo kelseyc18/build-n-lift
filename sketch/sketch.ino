@@ -106,14 +106,12 @@ void setup()
 }
 
 void loop()
-{
-  // Link EMG voltage to velocity
-	
+{ 
   // get EMG sensor values
   sensorValue1 = analogRead(analogInPin1);
   sensorValue2 = analogRead(analogInPin2);
   sensorValue3 = analogRead(analogInPin3);
-	
+  	
   // get direction of movement
   // 0: neg. direction
   // 1: pos. direction
@@ -123,7 +121,7 @@ void loop()
   // 0: xyz motion
   // 1: wrist motion
   modeValue = digitalRead(modeButton);
-	
+  	
   // compare sensor values with threshold and take corresponding action
   if (modeValue)
   {
@@ -163,7 +161,7 @@ void updateVelocities()
   if (moveZ) velZ = incZ;
   else velZ = 0;
 }
-
+  
 /* 
 Daniel, I think it might help to use the degreesToPulse() method to find 
 out how much you need to increase the pulse length by in order to change the angle.

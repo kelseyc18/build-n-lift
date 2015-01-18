@@ -91,7 +91,7 @@ int wristGripper = 370;
 int pulseOn = 2000;
 
 // desired angles for inverse kinematics
-int desiredDegrees[] = {0, 0, 0};
+float desiredDegrees[] = {0, 0, 0};
 
 void setup()
 {
@@ -215,9 +215,6 @@ This method uses inverse kinematics to determine the desired angles of the servo
 a desired xyz coordinate position.
 */
 void calculateDegrees (int x, int y, int z) {
-  desiredDegrees[0] = 0; // desired base angle
-  desiredDegrees[1] = 0; // desired shoulder angle
-  desiredDegrees[2] = 0; // desired elbow angle
   const float pi = 3.14159265259;
 //  int x = 2; // x we give
 //  int y = 2; // y we give
@@ -241,6 +238,9 @@ void calculateDegrees (int x, int y, int z) {
   float theta5 = acos((pow(length5,2.0) - pow(length2,2.0) - pow(length4,2.0))/(-2*length2*length4)); // angle from theta4 to humerus
   theta2 =theta4 +theta5; // adding to get theta 2
   // I am Africa
+  desiredDegrees[0] = theta1; // desired base angle
+  desiredDegrees[1] = theta2; // desired shoulder angle
+  desiredDegrees[2] = theta3; // desired elbow angle
 }
 
 /*
@@ -254,6 +254,5 @@ int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
   else if (angle_Degree < 180){
       pulse_length = map(angle_Degree, 0, 180, pulseMin, pulseMax);
     }
-  
   return pulse_length;
 }

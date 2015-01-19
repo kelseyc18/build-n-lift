@@ -81,10 +81,11 @@ int velZ = 0;
 boolean moveX = false;
 boolean moveY = false;
 boolean moveZ = false;
+
 // current servo value
-int wristAng = 90;
-int wristRot = 90;
-int wristGripper = 90;
+int wristAng = 350;
+int wristRot = 300;
+int wristGripper = 370;
 
 // pulse constants
 int pulseOn = 2000;
@@ -99,9 +100,9 @@ void setup()
   pwm.setPWMFreq(60); // max frequency is 1000 Hz
   
   // Setting all to middle, can do starting value if we want
-  pwm.setPWM(wristAngPort, 0, degreesToPulse(wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
-  pwm.setPWM(wristRotPort, 0, degreesToPulse(wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX));
-  pwm.setPWM(wristGripperPort, 0, degreesToPulse(wristGripper, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));
+  pwm.setPWM(wristAngPort, 0, degreesToPulse(90, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
+  pwm.setPWM(wristRotPort, 0, degreesToPulse(90, WRIST_ROT_MIN, WRIST_ROT_MAX));
+  pwm.setPWM(wristGripperPort, 0, degreesToPulse(90, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));
 }
 
 void loop()
@@ -170,20 +171,20 @@ int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int this
   if (value > threshhold){
     if (posNeg){
       pos += incWrist;
-      if ( pos > 180){
+      if (pos > thismax){
         pos-= incWrist;
       }
       else{
-        pwm.setPWM(portnum, pulseOn, degreesToPulse(pos,thismin,thismax) + pulseOn);
+        pwm.setPWM(portnum, pulseOn, pos + pulseOn);
       }
     }
     else{
       pos -= incWrist;
-      if(pos < 0){
+      if(pos < thismin){
         pos += incWrist;
       }
       else{
-        pwm.setPWM(portnum, pulseOn, degreesToPulse(pos,thismin,thismax) + pulseOn);
+        pwm.setPWM(portnum, pulseOn, pos + pulseOn);
       }
     }
   }
@@ -191,12 +192,6 @@ int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int this
   return pos;
 }
   
-// checking
-//work pls
-// "lion king noises"
-/*this?*/
-// haha this is great, Daniel. it's Daniel, right? otherwise, hi, Bernard.
-
 /*
 This method sets the servo angles so that the end effector is at the given position (in xyz coordinates).
 */
@@ -216,32 +211,31 @@ a desired xyz coordinate position.
 */
 // FYI, Arduino uses RADIANS, not degrees.
 void calculateDegrees (int x, int y, int z) {
-    const float pi = 3.14159265259;
-  //  int x = 2; // x we give
-  //  int y = 2; // y we give
-  //  int z = 2; // z we give
-    float phi = 2; // wrist angle we give, between end effector and line of forearm
-    float length1 = 1; // height from base to shoulder
-    float length2 = 1; // length from shoulder to elbow
-    float length3 = 1; // length from elbow to wrist
-    float ro = 1; //length from wrist to end effector
-    float r = 0; // distance to end effector from base on base plane
-    float theta1 = 0;  // base angle
-    float theta2 = 0; // angle of the servo at the shoulder, from horizontal
-    float theta3 = 0; // angle of the servo at the elbow, between wrist and shoulder
-    r = sqrt(pow(x, 2.0) +pow(y, 2.0)); // pythagoras
-    theta1 = atan2(y,x); // trig
-    float length5 = sqrt(pow(length3,2.0) + pow(ro,2.0) - 2*length3*ro*cos(pi-phi)); // law of cosines to find the length from the wrist to the end effector
-    float phi2 = acos((pow(-ro,2.0) - pow(length5,2.0) + pow(length3, 2.0))/(-2*length5*length3)); //angle from wrist-elbow-end effector
-    float length4 = sqrt(pow(r,2.0) + pow(z-length1,2.0)); // length from shoulder to end effector
-    theta3 = acos((pow(length4,2.0) - pow(length5,2.0) - pow(length2,2.0))/(-2*length5*length2)) + phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
-    float theta4 = atan2(z-length1, r); // angle from horizontal to end effector
-    float theta5 = acos((pow(length5,2.0) - pow(length2,2.0) - pow(length4,2.0))/(-2*length2*length4)); // angle from theta4 to humerus
-    theta2 =theta4 +theta5; // adding to get theta 2
-    // I am Africa
-    desiredDegrees[0] = theta1; // desired base angle
-    desiredDegrees[1] = theta2; // desired shoulder angle
-    desiredDegrees[2] = theta3; // desired elbow angle
+  const float pi = 3.14159265259;
+//  int x = 2; // x we give
+//  int y = 2; // y we give
+//  int z = 2; // z we give
+  float phi = 2; // wrist angle we give, between end effector and line of forearm
+  float length1 = 1; // height from base to shoulder
+  float length2 = 1; // length from shoulder to elbow
+  float length3 = 1; // length from elbow to wrist
+  float ro = 1; //length from wrist to end effector
+  float r = 0; // distance to end effector from base on base plane
+  float theta1 = 0;  // base angle
+  float theta2 = 0; // angle of the servo at the shoulder, from horizontal
+  float theta3 = 0; // angle of the servo at the elbow, between wrist and shoulder
+  r = sqrt(pow(x, 2.0) +pow(y, 2.0)); // pythagoras
+  theta1 = atan2(y,x); // trig
+  float length5 = sqrt(pow(length3,2.0) + pow(ro,2.0) - 2*length3*ro*cos(pi-phi)); // law of cosines to find the length from the wrist to the end effector
+  float phi2 = acos((pow(-ro,2.0) - pow(length5,2.0) + pow(length3, 2.0))/(-2*length5*length3)); //angle from wrist-elbow-end effector
+  float length4 = sqrt(pow(r,2.0) + pow(z-length1,2.0)); // length from shoulder to end effector
+  theta3 = acos((pow(length4,2.0) - pow(length5,2.0) - pow(length2,2.0))/(-2*length5*length2)) + phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
+  float theta4 = atan2(z-length1, r); // angle from horizontal to end effector
+  float theta5 = acos((pow(length5,2.0) - pow(length2,2.0) - pow(length4,2.0))/(-2*length2*length4)); // angle from theta4 to humerus
+  theta2 =theta4 +theta5; // adding to get theta 2
+  desiredDegrees[0] = map(theta1,0,pi,0,180); // desired base angle
+  desiredDegrees[1] = map(theta2,0,pi,0,180); // desired shoulder angle
+  desiredDegrees[2] = map(theta3,0,pi,0,180); // desired elbow angle
 }
 
 /*

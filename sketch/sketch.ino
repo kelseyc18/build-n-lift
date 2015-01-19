@@ -241,9 +241,9 @@ int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
   int pulse_length;
   if(angle_Degree > 180){
       pulse_length = map(angle_Degree, 0, 360, pulseMin, pulseMax);
-   }
-  else if (angle_Degree <= 180){
+  }
+  else // (angle_Degree <= 180) 
       pulse_length = map(angle_Degree, 0, 180, pulseMin, pulseMax);
-    }
+  }
   return pulse_length;
 }

@@ -101,123 +101,18 @@ void setup()
   Serial.begin(115200);
   pwm.begin();
   pwm.setPWMFreq(60); // max frequency is 1000 Hz
+  calculateDegrees(0,0,0,wristAng);
+  Serial.println (desiredDegrees[0]);
+  Serial.println (desiredDegrees[1]);
+  Serial.println (desiredDegrees[1]);
   
-  // Setting all to middle, can do starting value if we want
-  pwm.setPWM(wristAngPort, 0, degreesToPulse(90, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
-  pwm.setPWM(wristRotPort, 0, degreesToPulse(90, WRIST_ROT_MIN, WRIST_ROT_MAX));
-  pwm.setPWM(wristGripperPort, 0, degreesToPulse(90, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));
 }
-
 void loop()
-{ 
-  // get EMG sensor values
-  sensorValue1 = analogRead(analogInPin1);
-  sensorValue2 = analogRead(analogInPin2);
-  sensorValue3 = analogRead(analogInPin3);
-  	
-  // get direction of movement
-  // 0: neg. direction
-  // 1: pos. direction
-  dirValue = digitalRead(dirButton);
-  
-  // get mode
-  // 0: xyz motion
-  // 1: wrist motion
-  modeValue = digitalRead(modeButton);
-  	
-  // compare sensor values with threshold and take corresponding action
-  if (modeValue)
-  {
-    // move wrist servos
-    wristAng = moveWrist(sensorValue1, dirValue, wristAngPort, wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
-    wristRot = moveWrist(sensorValue2, dirValue, wristRotPort, wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX);
-    wristGripper = moveWrist(sensorValue3, dirValue, wristGripperPort, wristGripper, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX);
-  }
-  else
-  {
-    // move xyz servos
-    // check thresholds
-    moveX = checkThresh(sensorValue1, xThresh);
-    moveY = checkThresh(sensorValue2, yThresh);
-    moveZ = checkThresh(sensorValue3, zThresh);
-    // update velocities
-    updateVelocities();
-    if (dirValue) moveToPosition(currentX + velX, currentY + velY, currentZ + velZ);
-    else moveToPosition(currentX - velX, currentY - velY, currentZ - velZ);
-  }
+{
 }
 
-/*
-This function returns True if the sensor value is greater than the threshold value.
-*/
-boolean checkThresh(int sensor, int thresh)
-{
-  return sensor > thresh; 
-}
 
-void updateVelocities()
-{
-  if (moveX) velX = incX;
-  else velX = 0;
-  if (moveY) velY = incY;
-  else velY = 0;
-  if (moveZ) velZ = incZ;
-  else velZ = 0;
-}
-  
-/* 
-Daniel, I think it might help to use the degreesToPulse() method to find 
-out how much you need to increase the pulse length by in order to change the angle.
-*/
-int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int thismax)
-{
-  if (value > threshhold){
-    if (posNeg){
-      pos += incWrist;
-      if (pos > thismax){
-        pos-= incWrist;
-      }
-      else{
-        pwm.setPWM(portnum, pulseOn, pos + pulseOn);
-      }
-    }
-    else{
-      pos -= incWrist;
-      if(pos < thismin){
-        pos += incWrist;
-      }
-      else{
-        pwm.setPWM(portnum, pulseOn, pos + pulseOn);
-      }
-    }
-  }
-  delay(50);
-  return pos;
-}
-  
-/*
-This method sets the servo angles so that the end effector is at the given position (in xyz coordinates).
-*/
-void moveToPosition(int x, int y, int z) {
-  currentX = x;
-  currentY = y;
-  currentZ = z;
-  calculateDegrees(x, y, z,wristAng); // updates desiredDegrees
-  pwm.setPWM(basePort, 0, degreesToPulse(desiredDegrees[0], BASE_ROTATION_MIN, BASE_ROTATION_MAX));
-  pwm.setPWM(shoulderPort, 0, degreesToPulse(desiredDegrees[1], SHOULDER_MIN, SHOULDER_MAX));
-  pwm.setPWM(elbowPort, 0, degreesToPulse(desiredDegrees[2], ELBOW_MIN, ELBOW_MAX));
-}
-
-/*
-This method uses inverse kinematics to determine the desired angles of the servos given
-a desired xyz coordinate position.
-*/
-// FYI, Arduino uses RADIANS, not degrees.
 void calculateDegrees (int x, int y, int z, int wrist) {
-  if(abs(x) > HUMERUS+ULNA || pow(x,2.0) + pow(y,2.0) < 60 || y > HUMERUS + ULNA || z > BASE_HEIGHT+HUMERUS+ULNA || z < 0)
-  {
-    return;
-  }
   const float pi = 3.14159265259;
   float phi = map(wrist,WRIST_ANGLE_MIN,WRIST_ANGLE_MAX,0,pi); // wrist angle we give, between end effector and line of forearm
   float r; // distance to end effector from base on base plane
@@ -236,18 +131,4 @@ void calculateDegrees (int x, int y, int z, int wrist) {
   desiredDegrees[0] = map(theta1,0,pi,0,180); // desired base angle
   desiredDegrees[1] = map(theta2,0,pi,0,180); // desired shoulder angle
   desiredDegrees[2] = map(theta3,0,pi,0,180); // desired elbow angle
-}
-
-/*
-This method converts a desired angle in degrees to the corresponding desired pulse length.
-*/
-int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
-  int pulse_length;
-  if(angle_Degree > 180){
-      pulse_length = map(angle_Degree, 0, 360, pulseMin, pulseMax);
-  }
-  else // (angle_Degree <= 180) 
-      pulse_length = map(angle_Degree, 0, 180, pulseMin, pulseMax);
-  }
-  return pulse_length;
 }

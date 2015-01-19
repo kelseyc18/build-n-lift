@@ -81,10 +81,11 @@ int velZ = 0;
 boolean moveX = false;
 boolean moveY = false;
 boolean moveZ = false;
+
 // current servo value
-int wristAng = 90;
-int wristRot = 90;
-int wristGripper = 90;
+int wristAng = 350;
+int wristRot = 300;
+int wristGripper = 370;
 
 // pulse constants
 int pulseOn = 2000;
@@ -99,9 +100,9 @@ void setup()
   pwm.setPWMFreq(60); // max frequency is 1000 Hz
   
   // Setting all to middle, can do starting value if we want
-  pwm.setPWM(wristAngPort, 0, degreesToPulse(wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
-  pwm.setPWM(wristRotPort, 0, degreesToPulse(wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX));
-  pwm.setPWM(wristGripperPort, 0, degreesToPulse(wristGripper, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));
+  pwm.setPWM(wristAngPort, 0, degreesToPulse(90, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
+  pwm.setPWM(wristRotPort, 0, degreesToPulse(90, WRIST_ROT_MIN, WRIST_ROT_MAX));
+  pwm.setPWM(wristGripperPort, 0, degreesToPulse(90, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));
 }
 
 void loop()
@@ -170,20 +171,20 @@ int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int this
   if (value > threshhold){
     if (posNeg){
       pos += incWrist;
-      if ( pos > 180){
+      if (pos > thismax){
         pos-= incWrist;
       }
       else{
-        pwm.setPWM(portnum, pulseOn, degreesToPulse(pos,thismin,thismax) + pulseOn);
+        pwm.setPWM(portnum, pulseOn, pos + pulseOn);
       }
     }
     else{
       pos -= incWrist;
-      if(pos < 0){
+      if(pos < thismin){
         pos += incWrist;
       }
       else{
-        pwm.setPWM(portnum, pulseOn, degreesToPulse(pos,thismin,thismax) + pulseOn);
+        pwm.setPWM(portnum, pulseOn, pos + pulseOn);
       }
     }
   }

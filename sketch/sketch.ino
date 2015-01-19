@@ -202,6 +202,9 @@ int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int this
 This method sets the servo angles so that the end effector is at the given position (in xyz coordinates).
 */
 void moveToPosition(int x, int y, int z) {
+  currentX = x;
+  currentY = y;
+  currentZ = z;
   calculateDegrees(x, y, z); // updates desiredDegrees
   pwm.setPWM(basePort, 0, degreesToPulse(desiredDegrees[0], BASE_ROTATION_MIN, BASE_ROTATION_MAX));
   pwm.setPWM(shoulderPort, 0, degreesToPulse(desiredDegrees[1], SHOULDER_MIN, SHOULDER_MAX));
@@ -212,6 +215,7 @@ void moveToPosition(int x, int y, int z) {
 This method uses inverse kinematics to determine the desired angles of the servos given
 a desired xyz coordinate position.
 */
+// FYI, Arduino uses RADIANS, not degrees.
 void calculateDegrees (int x, int y, int z) {
   const float pi = 3.14159265259;
 //  int x = 2; // x we give

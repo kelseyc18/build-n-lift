@@ -23,8 +23,8 @@ const int WRIST_GRIPPER_MAX = 600;
 const int WRIST_ROT_MIN = 200; //guess
 const int WRIST_ROT_MAX = 400; // guess
 
-const int ELBOW_MIN = 100; // guess
-const int ELBOW_MAX = 500; // guess
+const int ELBOW_MIN = 300; // guess
+const int ELBOW_MAX = 400; // guess
 
 const int SHOULDER_MIN = 100; // guess
 const int SHOULDER_MAX = 500; // guess
@@ -94,7 +94,7 @@ int wristGripper = 370;
 int pulseOn = 2000;
 
 // desired angles for inverse kinematics
-float desiredDegrees[] = {90, 90, 90};
+float desiredDegrees[] = {0, 0, 0};
 
 void setup()
 {
@@ -202,7 +202,7 @@ void moveToPosition(int x, int y, int z) {
   currentX = x;
   currentY = y;
   currentZ = z;
-  calculateDegrees(x, y, z,wristAng); // updates desiredDegrees
+  calculateDegrees(x, y, z); // updates desiredDegrees
   pwm.setPWM(basePort, 0, degreesToPulse(desiredDegrees[0], BASE_ROTATION_MIN, BASE_ROTATION_MAX));
   pwm.setPWM(shoulderPort, 0, degreesToPulse(desiredDegrees[1], SHOULDER_MIN, SHOULDER_MAX));
   pwm.setPWM(elbowPort, 0, degreesToPulse(desiredDegrees[2], ELBOW_MIN, ELBOW_MAX));
@@ -213,13 +213,9 @@ This method uses inverse kinematics to determine the desired angles of the servo
 a desired xyz coordinate position.
 */
 // FYI, Arduino uses RADIANS, not degrees.
-void calculateDegrees (int x, int y, int z, int wrist) {
-  if(abs(x) > HUMERUS+ULNA || pow(x,2.0) + pow(y,2.0) < 60 || y > HUMERUS + ULNA || z > BASE_HEIGHT+HUMERUS+ULNA || z < 0)
-  {
-    return;
-  }
+void calculateDegrees (int x, int y, int z) {
   const float pi = 3.14159265259;
-  float phi = map(wrist,WRIST_ANGLE_MIN,WRIST_ANGLE_MAX,0,pi); // wrist angle we give, between end effector and line of forearm
+  float phi = 2; // wrist angle we give, between end effector and line of forearm
   float r; // distance to end effector from base on base plane
   float theta1;  // base angle
   float theta2; // angle of the servo at the shoulder, from horizontal
@@ -235,7 +231,11 @@ void calculateDegrees (int x, int y, int z, int wrist) {
   theta2 =theta4 +theta5; // adding to get theta 2
   desiredDegrees[0] = map(theta1,0,pi,0,180); // desired base angle
   desiredDegrees[1] = map(theta2,0,pi,0,180); // desired shoulder angle
-  desiredDegrees[2] = map(theta3,0,pi,0,180); // desired elbow angle
+  float theta3_deg = map(theta3, 0, pi, 0, 180);
+  if (theta3_deg > 135) {
+    theta3_deg = 135;
+  }
+  desiredDegrees[2] = theta3_deg; // desired elbow angle
 }
 
 /*

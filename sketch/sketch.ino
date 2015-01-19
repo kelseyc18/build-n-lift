@@ -192,12 +192,6 @@ int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int this
   return pos;
 }
   
-// checking
-//work pls
-// "lion king noises"
-/*this?*/
-// haha this is great, Daniel. it's Daniel, right? otherwise, hi, Bernard.
-
 /*
 This method sets the servo angles so that the end effector is at the given position (in xyz coordinates).
 */
@@ -232,17 +226,16 @@ void calculateDegrees (int x, int y, int z) {
   float theta3 = 0; // angle of the servo at the elbow, between wrist and shoulder
   r = sqrt(pow(x, 2.0) +pow(y, 2.0)); // pythagoras
   theta1 = atan2(y,x); // trig
-  float length5 = sqrt(pow(length3,2.0) + pow(ro,2.0) - 2*length3*ro*cos(180-phi)); // law of cosines to find the length from the wrist to the end effector
+  float length5 = sqrt(pow(length3,2.0) + pow(ro,2.0) - 2*length3*ro*cos(pi-phi)); // law of cosines to find the length from the wrist to the end effector
   float phi2 = acos((pow(-ro,2.0) - pow(length5,2.0) + pow(length3, 2.0))/(-2*length5*length3)); //angle from wrist-elbow-end effector
   float length4 = sqrt(pow(r,2.0) + pow(z-length1,2.0)); // length from shoulder to end effector
   theta3 = acos((pow(length4,2.0) - pow(length5,2.0) - pow(length2,2.0))/(-2*length5*length2)) + phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
   float theta4 = atan2(z-length1, r); // angle from horizontal to end effector
   float theta5 = acos((pow(length5,2.0) - pow(length2,2.0) - pow(length4,2.0))/(-2*length2*length4)); // angle from theta4 to humerus
   theta2 =theta4 +theta5; // adding to get theta 2
-  // I am Africa
-  desiredDegrees[0] = theta1; // desired base angle
-  desiredDegrees[1] = theta2; // desired shoulder angle
-  desiredDegrees[2] = theta3; // desired elbow angle
+  desiredDegrees[0] = map(theta1,0,pi,0,180); // desired base angle
+  desiredDegrees[1] = map(theta2,0,pi,0,180); // desired shoulder angle
+  desiredDegrees[2] = map(theta3,0,pi,0,180); // desired elbow angle
 }
 
 /*

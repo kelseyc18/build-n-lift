@@ -219,7 +219,7 @@ void calculateDegrees (int x, int y, int z, int wrist) {
     return;
   }
   const float pi = 3.14159265259;
-  float phi = map(wrist,WRIST_ANGLE_MIN,WRIST_ANGLE_MAX,0,pi); // wrist angle we give, between end effector and line of forearm
+  float phi = map(wrist,WRIST_ANGLE_MIN,WRIST_ANGLE_MAX,0,pi); // wrist angle we give, between end effector and line of forearm NEED TO KNOW WHAT 100 AND 585 LOOK LIKE ON THE WRIST!! UNSURE IF CODE WORKS THIS WAY
   float r; // distance to end effector from base on base plane
   float theta1;  // base angle
   float theta2; // angle of the servo at the shoulder, from horizontal

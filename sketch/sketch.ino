@@ -17,8 +17,8 @@ const int WRIST_GRIPPER_MAX = 600;
 const int WRIST_ROT_MIN = 200; //guess
 const int WRIST_ROT_MAX = 400; // guess
 
-const int ELBOW_MIN = 100; // guess
-const int ELBOW_MAX = 500; // guess
+const int ELBOW_MIN = 300; // corrected
+const int ELBOW_MAX = 400; 
 
 const int SHOULDER_MIN = 100; // guess
 const int SHOULDER_MAX = 500; // guess

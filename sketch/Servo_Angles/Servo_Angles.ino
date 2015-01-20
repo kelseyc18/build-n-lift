@@ -18,6 +18,9 @@ const int WRIST_ANGLE_MAX = 585;
 const int WRIST_GRIPPER_MIN = 150;
 const int WRIST_GRIPPER_MAX = 600;
 
+const int ELBOW_SERVO_MIN = 300;
+const int ELBOW_SERVO_MAX = 400;
+
 //#define const int ELBOW_MIN
 //#define const int ELBOW_MAX
 //#define const int SHOULDER_MIN
@@ -38,31 +41,33 @@ int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
   if(angle_Degree > 180){
       pulse_length = map(angle_Degree, 0, 360, pulseMin, pulseMax);
    }
-  else if (angle_Degree < 180){
+  else if (angle_Degree <= 180){
       pulse_length = map(angle_Degree, 0, 180, pulseMin, pulseMax);
     }
   
+  Serial.println(pulse_length);
   return pulse_length;
  }
 
 
-int no_sweep_pulselength = degreesToPulse(0, BASE_ROTATION_MIN, BASE_ROTATION_MAX);
-int half_sweep_pulselength = degreesToPulse(90, BASE_ROTATION_MIN, BASE_ROTATION_MAX);
-int full_sweep_pulselength = degreesToPulse(180, BASE_ROTATION_MIN, BASE_ROTATION_MAX);
+int sweep_pulselength = degreesToPulse(180, ELBOW_SERVO_MIN, ELBOW_SERVO_MAX);
+int half_sweep_pulselength = degreesToPulse(90, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
+int full_sweep_pulselength = degreesToPulse(180, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
 
 
 void setup(){
+  Serial.begin(9600);
   pwm.begin();
   pwm.setPWMFreq(60);
 }
 
 void loop(){
   // Testing Base Rotation
-  pwm.setPWM(servo_test_port, 0, no_sweep_pulselength); // 0 degrees
-  delay(500);
-  pwm.setPWM(servo_test_port, 0, half_sweep_pulselength); // 90 degrees
-  delay(500);
-  pwm.setPWM(servo_test_port, 0, full_sweep_pulselength); // 180 degrees
+  int sweep_pulselength = degreesToPulse(180, 200, 600);
+  pwm.setPWM(servo_test_port, 0, sweep_pulselength); // 0 degrees
+  delay(1000);
+ 
+  
 }
 
 

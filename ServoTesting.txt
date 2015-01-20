@@ -13,3 +13,11 @@ SERVOMIN
 #GRIPPER
 SERVOMIN 150
 SERVOMAX 600
+
+#ELBOW
+SERVOMIN 300
+SERVOMIN 650
+
+#
+Wrist_Zero_position_pulse_reading 100
+Writ_180_position_ 585

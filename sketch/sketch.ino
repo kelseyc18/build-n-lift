@@ -32,37 +32,31 @@ const int ELBOW_MAX = 100;
 const int SHOULDER_MIN = 100; // guess
 const int SHOULDER_MAX = 500; // guess
 
-// Pin inputs and outputs
+// Pin inputs
 const int analogInPin1 = A0;  	// Analog input pin that EMG-1 is attached to
 const int analogInPin2 = A1;	// Analog input pin that EMG-2 is attached to
 const int analogInPin3 = A2;	// Analog input pin that EMG-3 is attached to
-
 const int dirButton = 2;	// Digital input pin indicating positive or negative direction
 const int modeButton = 4;       // Digital input pin to toggle mode (xyz direction or wrist movement)
 
-// Wrist outputs
+// servo outputs
 int wristAngPort = 0;
 int wristRotPort = 1;
 int wristGripperPort = 2;
-
-// Remaining servo outputs
 int basePort = 3;
 int shoulderPort = 4;
 int elbowPort = 5;
 
-// XYZ velocity increments
+// increments
 const int incX = 5;
 const int incY = 5;
 const int incZ = 5;
-
-// wrist increments
 const int incWrist = 5;
 
 // Sensor values
 int sensorValue1 = 0;
 int sensorValue2 = 0;
 int sensorValue3 = 0;
-
 // Button values
 int dirValue = 0;
 int modeValue = 0;

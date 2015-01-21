@@ -92,9 +92,6 @@ int wristAng = 350;
 int wristRot = 300;
 int wristGripper = 370;
 
-// pulse constants
-int pulseOn = 2000;
-
 // desired angles for inverse kinematics
 float desiredDegrees[] = {0, 0, 0};
 
@@ -173,14 +170,14 @@ out how much you need to increase the pulse length by in order to change the ang
 */
 int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int thismax)
 {
-  if (value > threshhold){
+  if (value > threshold){
     if (posNeg){
       pos += incWrist;
       if (pos > thismax){
         pos-= incWrist;
       }
       else{
-        pwm.setPWM(portnum, pulseOn, pos + pulseOn);
+        pwm.setPWM(portnum, 0, pos);
       }
     }
     else{
@@ -189,7 +186,7 @@ int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int this
         pos += incWrist;
       }
       else{
-        pwm.setPWM(portnum, pulseOn, pos + pulseOn);
+        pwm.setPWM(portnum, 0, pos);
       }
     }
   }

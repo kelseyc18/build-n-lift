@@ -70,7 +70,7 @@ int modeValue = 0;
 int xThresh = 300;
 int yThresh = 300;
 int zThresh = 300;
-int threshhold = 300;  // for wrist
+int threshold = 300;  // for wrist
 
 // Current XYZ position
 int currentX = 0;
@@ -214,11 +214,8 @@ a desired xyz coordinate position.
 // FYI, Arduino uses RADIANS, not degrees.
 void calculateDegrees (int x, int y, int z) {
   const float pi = 3.14159265259;
-<<<<<<< HEAD
-  float phi = map(wrist,WRIST_ANGLE_MIN,WRIST_ANGLE_MAX,0,pi); // wrist angle we give, between end effector and line of forearm NEED TO KNOW WHAT 100 AND 585 LOOK LIKE ON THE WRIST!! UNSURE IF CODE WORKS THIS WAY
-=======
-  float phi = 2; // wrist angle we give, between end effector and line of forearm
->>>>>>> origin/master
+  float phi = map(wristAng,WRIST_ANGLE_MIN,WRIST_ANGLE_MAX,1,179); // wrist angle we give, between end effector and line of forearm NEED TO KNOW WHAT 100 AND 585 LOOK LIKE ON THE WRIST!! UNSURE IF CODE WORKS THIS WAY
+  phi = phi*pi/180;
   float r; // distance to end effector from base on base plane
   float theta1;  // base angle
   float theta2; // angle of the servo at the shoulder, from horizontal
@@ -226,19 +223,18 @@ void calculateDegrees (int x, int y, int z) {
   r = sqrt(pow(x, 2.0) +pow(y, 2.0)); // pythagoras
   theta1 = atan2(y,x); // trig
   float length5 = sqrt(pow(ULNA,2.0) + pow(GRIPPER,2.0) - 2*ULNA*GRIPPER*cos(pi-phi)); // law of cosines to find the length from the wrist to the end effector
-  float phi2 = acos((pow(-GRIPPER,2.0) - pow(length5,2.0) + pow(ULNA, 2.0))/(-2*length5*ULNA)); //angle from wrist-elbow-end effector
+  float phi2 = acos((pow(GRIPPER,2.0) - pow(length5,2.0) - pow(ULNA, 2.0))/(-2*length5*ULNA)); //angle from wrist-elbow-end effector
   float length4 = sqrt(pow(r,2.0) + pow(z-BASE_HEIGHT,2.0)); // length from shoulder to end effector
-  theta3 = acos((pow(length4,2.0) - pow(length5,2.0) - pow(HUMERUS,2.0))/(-2*length5*HUMERUS)) + phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
+  theta3 = acos((pow(length4,2.0) - pow(length5,2.0) - pow(HUMERUS,2.0))/(-2*length5*HUMERUS)) - phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
   float theta4 = atan2(z-BASE_HEIGHT, r); // angle from horizontal to end effector
   float theta5 = acos((pow(length5,2.0) - pow(HUMERUS,2.0) - pow(length4,2.0))/(-2*HUMERUS*length4)); // angle from theta4 to humerus
   theta2 =theta4 +theta5; // adding to get theta 2
-  desiredDegrees[0] = map(theta1,0,pi,0,180); // desired base angle
-  desiredDegrees[1] = map(theta2,0,pi,0,180); // desired shoulder angle
-  float theta3_deg = map(theta3, 0, pi, 0, 180);
-  if (theta3_deg > 135) {
-    theta3_deg = 135;
+  if (theta1 == NAN || theta2 == NAN || theta3 == NAN){
+    return;
   }
-  desiredDegrees[2] = theta3_deg; // desired elbow angle
+  desiredDegrees[0] = theta1; // desired base angle
+  desiredDegrees[1] = theta2; // desired shoulder angle
+  desiredDegrees[2] = theta3; // desired elbow angle
 }
 
 /*

@@ -11,8 +11,8 @@ const float ULNA = 187.325; // length from elbow to wrist
 const float GRIPPER = 100.00; //length from wrist to end effector
 
 //Pulse Ranges for Joint servos
-const int BASE_ROTATION_MIN = 150;
-const int BASE_ROTATION_MAX = 600;
+const int BASE_ROTATION_MIN = 600;
+const int BASE_ROTATION_MAX = 150;
 
 const int WRIST_ANGLE_MIN = 100;
 const int WRIST_ANGLE_MAX = 585;
@@ -23,10 +23,8 @@ const int WRIST_GRIPPER_MAX = 600;
 const int WRIST_ROT_MIN = 200; //guess
 const int WRIST_ROT_MAX = 400; // guess
 
-
-const int ELBOW_MIN = 300; // corrected
-const int ELBOW_MAX = 400; 
-
+const int ELBOW_MIN = 650; // corrected
+const int ELBOW_MAX = 100; 
 
 const int SHOULDER_MIN = 100; // guess
 const int SHOULDER_MAX = 500; // guess
@@ -98,6 +96,14 @@ float desiredDegrees[] = {0, 0, 0};
 void setup()
 {
   Serial.begin(115200);
+  // initialize the EMG input pins
+  pinMode(analogInPin1, INPUT);
+  pinMode(analogInPin2, INPUT);
+  pinMode(analogInPin3, INPUT);
+  // initialize the buttons
+  pinMode(dirButton, INPUT);
+  pinMode(modeButton, INPUT);
+  
   pwm.begin();
   pwm.setPWMFreq(60); // max frequency is 1000 Hz
   
@@ -125,7 +131,7 @@ void loop()
   modeValue = digitalRead(modeButton);
   	
   // compare sensor values with threshold and take corresponding action
-  if (modeValue)
+  if (modeValue == HIGH)
   {
     // move wrist servos
     wristAng = moveWrist(sensorValue1, dirValue, wristAngPort, wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
@@ -141,7 +147,7 @@ void loop()
     moveZ = checkThresh(sensorValue3, zThresh);
     // update velocities
     updateVelocities();
-    if (dirValue) moveToPosition(currentX + velX, currentY + velY, currentZ + velZ);
+    if (dirValue == HIGH) moveToPosition(currentX + velX, currentY + velY, currentZ + velZ);
     else moveToPosition(currentX - velX, currentY - velY, currentZ - velZ);
   }
 }
@@ -171,7 +177,7 @@ out how much you need to increase the pulse length by in order to change the ang
 int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int thismax)
 {
   if (value > threshold){
-    if (posNeg){
+    if (posNeg == HIGH){
       pos += incWrist;
       if (pos > thismax){
         pos-= incWrist;

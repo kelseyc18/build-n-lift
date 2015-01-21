@@ -11,6 +11,8 @@ const float ULNA = 187.325; // length from elbow to wrist
 const float GRIPPER = 100.00; //length from wrist to end effector
 
 //Pulse Ranges for Joint servos
+// min values correspond to 0 degrees
+// max values correspond to 180 degrees
 const int BASE_ROTATION_MIN = 600;
 const int BASE_ROTATION_MAX = 150;
 

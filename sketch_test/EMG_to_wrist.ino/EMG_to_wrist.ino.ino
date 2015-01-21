@@ -25,10 +25,14 @@ int wristGripper = 370;
 // wrist increments
 const int incWrist = 5;
 
+const int threshold = 500;
+
 int sensorValue1;
 int sensorValue2;
 int sensorValue3;
 int dirValue;
+
+int counter = 0;
 
 void setup()
 {
@@ -37,21 +41,35 @@ void setup()
 
 void loop()
 {
-  for (int i = 400; i <= 600; i += 100) {
-      for (int j = 400; j <= 600; j += 100) {
-        for (int k = 400; k <= 600; k += 100) {
-          for (int l = 0; l <= 1; l++) {
-            sensorValue1 = i;
-            sensorValue2 = j;
-            sensorValue3 = k;
-            dirValue = l;
-  
-            wristAng = moveWrist(sensorValue1, dirValue, wristAngPort, wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
-            wristRot = moveWrist(sensorValue2, dirValue, wristRotPort, wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX);
-            wristGripper = moveWrist(sensorValue3, dirValue, wristGripperPort, wristGripper, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX);
+  while (counter < 1) {
+    for (int i = 400; i <= 600; i += 100) {
+        for (int j = 400; j <= 600; j += 100) {
+          for (int k = 400; k <= 600; k += 100) {
+            for (int l = 0; l <= 1; l++) {
+              sensorValue1 = i;
+              sensorValue2 = j;
+              sensorValue3 = k;
+              dirValue = l;
+              
+              Serial.println(i);
+              Serial.println(j);
+              Serial.println(k);
+              Serial.println(l);
+    
+              wristAng = moveWrist(sensorValue1, dirValue, wristAngPort, wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
+              wristRot = moveWrist(sensorValue2, dirValue, wristRotPort, wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX);
+              wristGripper = moveWrist(sensorValue3, dirValue, wristGripperPort, wristGripper, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX);
+              Serial.print(wristAng);
+              Serial.print(", ");
+              Serial.print(wristRot);
+              Serial.print(", ");
+              Serial.println(wristGripper);
+            }
+            Serial.println();
           }
         }
       }
+  counter++;
   }
 }
 

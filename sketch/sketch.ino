@@ -96,6 +96,9 @@ float desiredDegrees[] = {0, 0, 0};
 void setup()
 {
   Serial.begin(115200);
+  pwm.begin();
+  pwm.setPWMFreq(60); // max frequency is 1000 Hz
+  
   // initialize the EMG input pins
   pinMode(analogInPin1, INPUT);
   pinMode(analogInPin2, INPUT);
@@ -104,8 +107,13 @@ void setup()
   pinMode(dirButton, INPUT);
   pinMode(modeButton, INPUT);
   
-  pwm.begin();
-  pwm.setPWMFreq(60); // max frequency is 1000 Hz
+  // initialize servo output pins
+  pinMode(wristAngPort, OUTPUT);
+  pinMode(wristRotPort, OUTPUT);
+  pinMode(wristGripperPort, OUTPUT);
+  pinMode(basePort, OUTPUT);
+  pinMode(shoulderPort, OUTPUT);
+  pinMode(elbowPort, OUTPUT);
   
   // Setting all to middle, can do starting value if we want
   pwm.setPWM(wristAngPort, 0, degreesToPulse(90, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));

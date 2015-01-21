@@ -22,6 +22,7 @@ const int WRIST_ANGLE_MAX = 585;
 const int WRIST_GRIPPER_MIN = 150;
 const int WRIST_GRIPPER_MAX = 600;
 
+// 360 degree servo
 const int WRIST_ROT_MIN = 200; //guess
 const int WRIST_ROT_MAX = 400; // guess
 

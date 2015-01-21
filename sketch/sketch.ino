@@ -182,7 +182,7 @@ out how much you need to increase the pulse length by in order to change the ang
 int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int thismax)
 {
   if (value > threshold){
-    if (posNeg == HIGH){
+    if (posNeg == HIGH){ // positive direction
       pos += incWrist;
       if (pos > thismax){
         pos-= incWrist;
@@ -191,7 +191,7 @@ int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int this
         pwm.setPWM(portnum, 0, pos);
       }
     }
-    else{
+    else{ // negative direction
       pos -= incWrist;
       if(pos < thismin){
         pos += incWrist;

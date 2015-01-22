@@ -225,7 +225,7 @@ a desired xyz coordinate position.
 // FYI, Arduino uses RADIANS, not degrees.
 void calculateDegrees (int x, int y, int z) {
   const float pi = 3.14159265259;
-  float phi = map(wristAng,WRIST_ANGLE_MIN,WRIST_ANGLE_MAX,1,179); // wrist angle we give, between end effector and line of forearm NEED TO KNOW WHAT 100 AND 585 LOOK LIKE ON THE WRIST!! UNSURE IF CODE WORKS THIS WAY
+  float phi = map(wristAng,WRIST_ANGLE_MIN,WRIST_ANGLE_MAX,1,179); // wrist angle we give, between end effector and line of forearm LOOK AT HOW WRISTANG IS STORED AND IF THIS IS CONSISTENT WITH THAT
   phi = phi*pi/180;
   float r; // distance to end effector from base on base plane
   float theta1;  // base angle

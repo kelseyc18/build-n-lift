@@ -94,7 +94,7 @@ void setup()
 {
   Serial.begin(9600);
   pwm.begin();
-  pwm.setPWMFreq(60); // max frequency is 1000 Hz
+  pwm.setPWMFreq(10); // max frequency is 1000 Hz
   
   // initialize the EMG input pins
   pinMode(analogInPin1, INPUT);
@@ -120,46 +120,20 @@ void setup()
 
 void loop()
 { 
-  modeValue = 0;
-  for (int i = 400; i <= 600; i += 100) {
-      for (int j = 400; j <= 600; j += 100) {
-        for (int k = 400; k <= 600; k += 100) {
-          for (int l = 0; l <= 1; l++) {
-            sensorValue1 = i;
-            sensorValue2 = j;
-            sensorValue3 = k;
-            dirValue = l;
-            
-            Serial.println(i);
-            Serial.println(j);
-            Serial.println(k);
-            Serial.println(l);
-  	
-            // compare sensor values with threshold and take corresponding action
-            if (modeValue == HIGH)
-            {
-              // move wrist servos
-              wristAng = moveWrist(sensorValue1, dirValue, wristAngPort, wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
-              wristRot = moveWrist(sensorValue2, dirValue, wristRotPort, wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX);
-              wristGripper = moveWrist(sensorValue3, dirValue, wristGripperPort, wristGripper, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX);
-            }
-            else
-            {
-              // move xyz servos
-              // check thresholds
-              moveX = checkThresh(sensorValue1, xThresh);
-              moveY = checkThresh(sensorValue2, yThresh);
-              moveZ = checkThresh(sensorValue3, zThresh);
-              // update velocities
-              updateVelocities();
-              if (dirValue == HIGH) moveToPosition(currentX + velX, currentY + velY, currentZ + velZ);
-              else moveToPosition(currentX - velX, currentY - velY, currentZ - velZ);
-              delay(10000);
-            }
-          }
-        }
-      }
-  }
+//  pwm.setPWM(elbowPort, 0, degreesToPulse(180, ELBOW_MIN, ELBOW_MAX));
+//  moveToPosition(125, 125, 60);
+//  delay(5000);
+//  moveToPosition(125, 125, 100);
+//  delay(5000);
+//  moveToPosition(-125, 125, 100);
+//  delay(5000);
+//  moveToPosition(-125, 125, 60);
+//  delay(5000);
+  moveToPosition(0, 125, 70);
+  delay(5000);
+  moveToPosition(0, 300, 70);
+  delay(5000);
+  
 }
 
 /*
@@ -248,9 +222,15 @@ void calculateDegrees (int x, int y, int z) {
   if (theta1 == NAN || theta2 == NAN || theta3 == NAN){
     return;
   }
-  desiredDegrees[0] = theta1; // desired base angle
-  desiredDegrees[1] = theta2; // desired shoulder angle
-  desiredDegrees[2] = theta3; // desired elbow angle
+  float theta1Deg = theta1/pi*180;
+  float theta2Deg = theta2/pi*180;
+  float theta3Deg = theta3/pi*180;
+  if (theta3Deg < 45) {
+    theta3Deg = 45;
+  }
+  desiredDegrees[0] = theta1Deg + 45; // desired base angle
+  desiredDegrees[1] = theta2Deg; // desired shoulder angle
+  desiredDegrees[2] = theta3Deg; // desired elbow angle
 }
 
 /*

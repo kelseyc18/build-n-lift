@@ -26,8 +26,8 @@ const int WRIST_GRIPPER_MAX = 600;
 const int WRIST_ROT_MIN = 200; //guess
 const int WRIST_ROT_MAX = 400; // guess
 
-const int ELBOW_MIN = 650; // corrected
-const int ELBOW_MAX = 100; 
+const int ELBOW_MIN = 500; // corrected
+const int ELBOW_MAX = 200; 
 
 const int SHOULDER_MIN = 100; // guess
 const int SHOULDER_MAX = 500; // guess
@@ -83,7 +83,7 @@ boolean moveY = false;
 boolean moveZ = false;
 
 // current servo value
-int wristAng = 350;
+int wristAng = 150;
 int wristRot = 300;
 int wristGripper = 370;
 
@@ -124,14 +124,15 @@ void loop()
 //  moveToPosition(125, 125, 60);
 //  delay(5000);
 //  moveToPosition(125, 125, 100);
-//  delay(5000);
+//  delay(5000);  
 //  moveToPosition(-125, 125, 100);
 //  delay(5000);
 //  moveToPosition(-125, 125, 60);
 //  delay(5000);
-  moveToPosition(0, 125, 70);
+  moveToPosition(0, 200, 100);
   delay(5000);
-  moveToPosition(0, 300, 70);
+  moveToPosition(0, 350, 100);
+//  pwm.setPWM(elbowPort, 0, degreesToPulse(90,ELBOW_MIN,ELBOW_MAX));
   delay(5000);
   
 }
@@ -231,6 +232,8 @@ void calculateDegrees (int x, int y, int z) {
   desiredDegrees[0] = theta1Deg + 45; // desired base angle
   desiredDegrees[1] = theta2Deg; // desired shoulder angle
   desiredDegrees[2] = theta3Deg; // desired elbow angle
+  Serial.println(theta3Deg);
+  Serial.println(degreesToPulse(theta3Deg,ELBOW_MIN,ELBOW_MAX));
 }
 
 /*

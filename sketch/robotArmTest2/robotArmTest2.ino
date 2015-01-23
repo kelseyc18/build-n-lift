@@ -13,8 +13,8 @@ const float GRIPPER = 100.00; //length from wrist to end effector
 //Pulse Ranges for Joint servos
 // min values correspond to 0 degrees
 // max values correspond to 180 degrees
-const int BASE_ROTATION_MIN = 600;
-const int BASE_ROTATION_MAX = 150;
+const int BASE_ROTATION_MIN = 150;
+const int BASE_ROTATION_MAX = 600;
 
 const int WRIST_ANGLE_MIN = 100;
 const int WRIST_ANGLE_MAX = 585;
@@ -26,11 +26,12 @@ const int WRIST_GRIPPER_MAX = 600;
 const int WRIST_ROT_MIN = 200; //guess
 const int WRIST_ROT_MAX = 400; // guess
 
-const int ELBOW_MIN = 500; // corrected
-const int ELBOW_MAX = 200; 
 
-const int SHOULDER_MIN = 100; // guess
-const int SHOULDER_MAX = 500; // guess
+const int ELBOW_MIN = 200; // corrected
+const int ELBOW_MAX = 500; 
+
+const int SHOULDER_MIN = 175; // guess
+const int SHOULDER_MAX = 600; // guess
 
 // Pin inputs
 const int analogInPin1 = A0;  	// Analog input pin that EMG-1 is attached to
@@ -83,12 +84,15 @@ boolean moveY = false;
 boolean moveZ = false;
 
 // current servo value
+
 int wristAng = 150;
 int wristRot = 300;
 int wristGripper = 370;
 
 // desired angles for inverse kinematics
 float desiredDegrees[] = {0, 0, 0};
+//desired angles to input to joint servos
+float servoAngles[] = {0,0,0};
 
 void setup()
 {
@@ -129,11 +133,6 @@ void loop()
 //  delay(5000);
 //  moveToPosition(-125, 125, 60);
 //  delay(5000);
-  moveToPosition(0, 200, 100);
-  delay(5000);
-  moveToPosition(0, 350, 100);
-//  pwm.setPWM(elbowPort, 0, degreesToPulse(90,ELBOW_MIN,ELBOW_MAX));
-  delay(5000);
   
 }
 
@@ -193,9 +192,10 @@ void moveToPosition(int x, int y, int z) {
   currentY = y;
   currentZ = z;
   calculateDegrees(x, y, z); // updates desiredDegrees
-  pwm.setPWM(basePort, 0, degreesToPulse(desiredDegrees[0], BASE_ROTATION_MIN, BASE_ROTATION_MAX));
-  pwm.setPWM(shoulderPort, 0, degreesToPulse(desiredDegrees[1], SHOULDER_MIN, SHOULDER_MAX));
-  pwm.setPWM(elbowPort, 0, degreesToPulse(desiredDegrees[2], ELBOW_MIN, ELBOW_MAX));
+  jointToServoAngles(desiredDegrees[0],desiredDegrees[1],desiredDegrees[2]);
+  pwm.setPWM(basePort, 0, degreesToPulse(servoAngles[0], BASE_ROTATION_MIN, BASE_ROTATION_MAX));
+  pwm.setPWM(shoulderPort, 0, degreesToPulse(servoAngles[1], SHOULDER_MIN, SHOULDER_MAX));
+  pwm.setPWM(elbowPort, 0, degreesToPulse(servoAngles[2], ELBOW_MIN, ELBOW_MAX));
 }
 
 /*
@@ -239,13 +239,22 @@ void calculateDegrees (int x, int y, int z) {
 /*
 This method converts a desired angle in degrees to the corresponding desired pulse length.
 */
+
+void jointAnglesToServoAngles(float theta1, float theta2, float theta3){
+  servoAngles[0] = theta1 - 180;// Servo angle for base rotation
+  servoAngles[1] = theta2 
+  servoAngles[2] = theta3 - 70// Servo angle for elbow
+  
+}
 int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
   int pulse_length;
-  if(angle_Degree > 180){
+  /*
+  if(angle_Degree > 180){// Does not have any affect
       pulse_length = map(angle_Degree, 0, 360, pulseMin, pulseMax);
   }
-  else{ // (angle_Degree <= 180) 
+  */
+  //else// (angle_Degree <= 180) 
       pulse_length = map(angle_Degree, 0, 180, pulseMin, pulseMax);
-  }
+  //}
   return pulse_length;
 }

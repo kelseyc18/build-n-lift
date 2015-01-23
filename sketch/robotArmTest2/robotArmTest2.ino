@@ -229,7 +229,7 @@ void calculateDegrees (int x, int y, int z) {
   if (theta3Deg < 45) {
     theta3Deg = 45;
   }
-  desiredDegrees[0] = theta1Deg + 45; // desired base angle
+  desiredDegrees[0] = theta1Deg; // desired base angle
   desiredDegrees[1] = theta2Deg; // desired shoulder angle
   desiredDegrees[2] = theta3Deg; // desired elbow angle
   Serial.println(theta3Deg);

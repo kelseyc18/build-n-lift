@@ -16,10 +16,10 @@ const float GRIPPER = 100.00; //length from wrist to end effector
 const int BASE_ROTATION_MIN = 600;
 const int BASE_ROTATION_MAX = 150;
 
-const int WRIST_ANGLE_MIN = 100;
-const int WRIST_ANGLE_MAX = 585;
+const int WRIST_ANGLE_MIN = 180; // 90 degrees below arm
+const int WRIST_ANGLE_MAX = 630; // - 90 degrees below arm level
 
-const int WRIST_GRIPPER_MIN = 150;
+const int WRIST_GRIPPER_MIN = 150; 
 const int WRIST_GRIPPER_MAX = 600;
 
 // 360 degree servo
@@ -52,6 +52,7 @@ const int incX = 5;
 const int incY = 5;
 const int incZ = 5;
 const int incWrist = 5;
+const int incWristAng = 1;
 
 // Sensor values
 int sensorValue1 = 0;
@@ -83,9 +84,14 @@ boolean moveY = false;
 boolean moveZ = false;
 
 // current servo value
-int wristAng = 350;
 int wristRot = 300;
 int wristGripper = 370;
+
+
+//Current wrist angle, 90 is straight down while ulna is horizontal, -90 is straight up
+int wristAng = 90;
+
+int wristAngBelowHorizontal = 90;
 
 // desired angles for inverse kinematics
 float desiredDegrees[] = {0, 0, 0};
@@ -179,30 +185,64 @@ void updateVelocities()
 Daniel, I think it might help to use the degreesToPulse() method to find 
 out how much you need to increase the pulse length by in order to change the angle.
 */
-int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int thismax)
+//int moveWrist(int value, int posNeg, int portnum, int pos, int thismin, int thismax)
+//{
+//  if (value > threshold){
+//    if (posNeg == HIGH){ // positive direction
+//      pos += incWrist;
+//      if (pos > thismax){
+//        pos-= incWrist;
+//      }
+//      else{
+//        pwm.setPWM(portnum, 0, pos);
+//      }
+//    }
+//    else{ // negative direction
+//      pos -= incWrist;
+//      if(pos < thismin){
+//        pos += incWrist;
+//      }
+//      else{
+//        pwm.setPWM(portnum, 0, pos);
+//      }
+//    }
+//  }
+//  delay(50);
+//  return pos;
+//}
+void moveWristAng(int value, int posNeg, int portnum)
 {
-  if (value > threshold){
-    if (posNeg == HIGH){ // positive direction
-      pos += incWrist;
-      if (pos > thismax){
-        pos-= incWrist;
-      }
-      else{
-        pwm.setPWM(portnum, 0, pos);
-      }
+  
+  if ( value >= threshold){
+   if (posNeg == HIGH && wristAng + incWristAng <= 90)
+   {
+     wristAng += incWristAng;
+     wristAngleBelowHorizontal += incWristAng;
+     
+   }
+   else if (wristAng - incWristAng >= -90)
+   {
+     wristang -= incWristAng;
+     wristAngleBelowHorizontal -= incWristAng;
+     
+   }
+   //pwm.setPWM( WHATEVER BERNARD CODE LOOKS LIKE GOES HERE WHEN HE'S DONE
+   
+  }
+  return;
+}
+void moveGripper(int value, int posNeg, int portnum)
+{
+  if (value >= threshold){
+    if (posNeg == HIGH &&  wristGripper + incWrist <= WRIST_GRIPPER_MAX)
+    {
+      wristGripper += incWrist;
     }
-    else{ // negative direction
-      pos -= incWrist;
-      if(pos < thismin){
-        pos += incWrist;
-      }
-      else{
-        pwm.setPWM(portnum, 0, pos);
-      }
+    else if (wristGripper -= incWrist <= WRIST_GRIPPER_MIN){
+      wristgripper-= incWrist;
     }
   }
-  delay(50);
-  return pos;
+  //pwm.setPWM(WHATEVER BERNARD"S CODE LOOKS LIKE WHEN HE"S DONE
 }
   
 /*
@@ -248,6 +288,23 @@ void calculateDegrees (int x, int y, int z) {
   desiredDegrees[2] = theta3; // desired elbow angle
 }
 
+void calculateDegreesTwo(int x, int y, int z) {
+  const float pi = 3.14159265259;
+  float alpha = wristAngBelowHorizontal * pi/180;
+  float r = sqrt(pow(x, 2.0) +pow(y, 2.0));
+  float theta1 = atan2(y,x); // trig
+  float length4 = sqrt(pow(r-GRIPPER*cos(alpha),2.0) + pow(z-BASE_HEIGHT-GRIPPER*cos(alpha),2.0)); // length from shoulder to wrist
+  float theta4 = atan2(z-BASE_HEIGHT-GRIPPER*sin(alpha), r-GRIPPER*cos(alpha)); // angle from horizontal to wrist
+  float theta5 = acos((pow(ULNA,2.0)-pow(HUMERUS,2.0) - pow(length4,2.0))/(-2*HUMERUS*length4));
+  float theta3 = acos((pow(length4,2.0) - pow(HUMERUS,2.0) - pow(HUMERUS,2.0))/(-2*HUMERUS*ULNA));
+  float theta6 = 180- theta5 - theta3;
+  float theta2 = theta5+ theta4;
+  float wristAngleFromUlna = theta6 + pi/2 -theta4 + pi/2 - alpha;
+  wristAngleFromUlna = wristAngleFromUlna*180/pi;  
+  wristAng = 180 - wristAngleFromUlna;
+  
+  
+} 
 /*
 This method converts a desired angle in degrees to the corresponding desired pulse length.
 */

@@ -16,11 +16,11 @@ const int WRIST_GRIPPER_MAX = 600;
 const int WRIST_ROT_MIN = 200; //guess
 const int WRIST_ROT_MAX = 400; // guess
 
-const int ELBOW_MIN = 650; // corrected
-const int ELBOW_MAX = 100; 
+const int ELBOW_MIN = 100; // corrected
+const int ELBOW_MAX = 650; 
 
-const int SHOULDER_MIN = 100; // guess
-const int SHOULDER_MAX = 500; // guess
+const int SHOULDER_MIN = 150; // guess
+const int SHOULDER_MAX = 600; // guess
 
 const int servoPort = 0;
 
@@ -32,17 +32,31 @@ void setup()
   
   pinMode(servoPort, OUTPUT);
 
-  pwm.setPWM(servoPort, 0, degreesToPulse(0, SERVO_MIN, SERVO_MAX));
+  pwm.setPWM(servoPort, 0, degreesToPulse(0, SHOULDER_MIN, SHOULDER_MAX));
 }
 
 void loop()
 {
   for (int deg = 0; deg <= 180; deg += 10)
   {
-    pwm.setPWM(servoPort, 0, degreesToPulse(deg, SERVO_MIN, SERVO_MAX));
+    pwm.setPWM(servoPort, 0, degreesToPulse(deg, SHOULDER_MIN, SHOULDER_MAX));
     Serial.println(deg);
-    Serial.println(degreesToPulse(deg, SERVO_MIN, SERVO_MAX));
+    Serial.println(degreesToPulse(deg, SHOULDER_MIN, SHOULDER_MAX));
     Serial.println();
     delay(1000);
   }
+}
+
+int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
+  int pulse_length;
+  /*
+  if(angle_Degree > 180){// Does not have any affect
+      pulse_length = map(angle_Degree, 0, 360, pulseMin, pulseMax);
+  }
+  */
+  //else// (angle_Degree <= 180) 
+      pulse_length = map(angle_Degree, 0, 180, pulseMin, pulseMax);
+      Serial.println(pulse_length);
+  //}
+  return pulse_length;
 }

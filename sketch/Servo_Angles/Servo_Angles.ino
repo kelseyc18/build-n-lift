@@ -67,8 +67,8 @@ void loop(){
   
   int dummy_variable = 300;
   // Testing Base Rotation
-  int sweep_pulselength = degreesToPulse(70, ELBOW_SERVO_MIN, ELBOW_SERVO_MAX);
-  pwm.setPWM(servo_test_port, 0, sweep_pulselength); // 0 degrees
+  int sweep_pulselength = degreesToPulse(0, BASE_ROTATION_MIN, BASE_ROTATION_MAX);
+  pwm.setPWM(servo_test_port, 0, 630); // 0 degrees
   
  
   }

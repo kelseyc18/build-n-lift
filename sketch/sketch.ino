@@ -98,7 +98,7 @@ float desiredDegrees[] = {0, 0, 0};
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   pwm.begin();
   pwm.setPWMFreq(60); // max frequency is 1000 Hz
   

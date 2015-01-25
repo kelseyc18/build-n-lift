@@ -31,6 +31,9 @@ const int SHOULDER_MAX = 600; // Old 600
 const int basePort = 0;
 const int shoulderPort = 1;
 const int elbowPort = 2;
+const int wristAngPort = 3;
+const int wristRotPort = 4;
+const int wristGripperPort = 5;
 
 const int analogInPin1 = A0;  	// Analog input pin that EMG-1 is attached to
 const int dirPort = 12;
@@ -73,6 +76,14 @@ void loop()
   dirValue = digitalRead(dirPort);
   Serial.println(sensorValue1);
   oneSensorMove(sensorValue1, xThresh);
+}
+
+void threesixtyServo(int sensorValue, int thresh) {
+  if (sensorValue > thresh) {
+    if (dirValue == HIGH) pwm.setPWM(wristRotPort, 0, 500);
+    else pwm.setPWM(wristRotPort, 0, 850);
+  }
+  else pwm.setPWM(wristRotPort, 0, 0);
 }
 
 void oneSensorMove(int sensorValue, int thresh) {

@@ -37,12 +37,12 @@ const int incWristRot = 2;
 const int incWristGripper = 5;
 
 // AND THESE
-int xThresh = 700;
-int yThresh = 300;
-int zThresh = 300;
-int wristAngThresh = 300;  // for wrist
-int wristRotThresh = 300;
-int wristGripperThresh = 300;
+int xThresh = 550;
+int yThresh = 550;
+int zThresh = 550;
+int wristAngThresh = 550;  // for wrist
+int wristRotThresh = 550;
+int wristGripperThresh = 500;
 
 // Initialize output pins
 const int basePort = 0;

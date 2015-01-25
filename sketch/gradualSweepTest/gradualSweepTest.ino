@@ -3,6 +3,12 @@
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
+// Arm dimensions (mm)
+const float BASE_HEIGHT = 67.31; // height from base to shoulder
+const float HUMERUS = 146.05; // length from shoulder to elbow
+const float ULNA = 187.325; // length from elbow to wrist
+const float GRIPPER = 100.00; //length from wrist to end effector
+
 const int BASE_ROTATION_MIN = 600;
 const int BASE_ROTATION_MAX = 150;
 
@@ -25,6 +31,10 @@ const int SHOULDER_MAX = 600; // Old 600
 const int basePort = 0;
 const int shoulderPort = 1;
 const int elbowPort = 2;
+
+int wristAng = 150;
+int wristRot = 300;
+int wristGripper = 370;
 
 float desiredDegrees[] = {0, 0, 0};
 
@@ -60,16 +70,7 @@ void moveToPosition(int x, int y, int z) {
 }
 
 int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
-  int pulse_length;
-  /*
-  if(angle_Degree > 180){// Does not have any affect
-      pulse_length = map(angle_Degree, 0, 360, pulseMin, pulseMax);
-  }
-  */
-  //else// (angle_Degree <= 180) 
-      pulse_length = map(angle_Degree, 0, 180, pulseMin, pulseMax);
-      Serial.println(pulse_length);
-  //}
+  int pulse_length = map(angle_Degree, 0, 180, pulseMin, pulseMax);
   return pulse_length;
 }
 

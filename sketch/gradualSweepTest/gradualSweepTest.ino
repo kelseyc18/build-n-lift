@@ -32,6 +32,9 @@ const int basePort = 0;
 const int shoulderPort = 1;
 const int elbowPort = 2;
 
+const int analogInPin1 = A0;  	// Analog input pin that EMG-1 is attached to
+const int dirPort = 12;
+
 int wristAng = 150;
 int wristRot = 300;
 int wristGripper = 370;
@@ -42,9 +45,11 @@ int currentY = 150;
 int currentZ = 60;
 
 int velX = 5;
+int xThresh = 300;
 
-const int dirPort = 12;
 int dirValue;
+
+int sensorValue1;
 
 float desiredDegrees[] = {0, 0, 0};
 
@@ -57,13 +62,25 @@ void setup()
   pinMode(basePort, OUTPUT);
   pinMode(shoulderPort, OUTPUT);
   pinMode(elbowPort, OUTPUT);
+  
+  pinMode(analogInPin1, INPUT);
   pinMode(dirPort, INPUT);
 }
 
 void loop()
 {
+  sensorValue1 = analogRead(analogInPin1);
   dirValue = digitalRead(dirPort);
-  moveButton();
+  Serial.println(sensorValue1);
+  oneSensorMove(sensorValue1, xThresh);
+}
+
+void oneSensorMove(int sensorValue, int thresh) {
+  if (sensorValue > thresh) {
+    currentX += velX;
+  }
+  moveToPosition(currentX, currentY, currentZ);
+  delay(1000);
 }
 
 void moveButton() {

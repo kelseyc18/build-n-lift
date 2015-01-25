@@ -59,9 +59,10 @@ const int dirPort = 12;         // Digital input pin to toggle direction (positi
 const int modePort = 13;        // Digital input pin to toggle mode (xyz direction or wrist movement)
 
 // Wrist pulse lengths
-int wristAng = 150;
-int wristRot = 300;
-int wristGripper = 370;
+int wristAng = 0;
+int wristAngBelowHorizontal = 90; //when wristAng = 0 and ulna is horizontal, this equals 90
+int wristRot = 90;
+int wristGripper = 90;
 
 // Current XYZ position
 int currentX = 0;
@@ -128,7 +129,8 @@ void oneSensorMoveWrist() {
 //    pwm.setPWM(wristAngPort, 0, degreesToPulse(wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));//Increase Wrist Angle
 //  }
   if(sensorValue1 > wristGripperThresh){
-    if (dirValue == HIGH && wristGripper <= 180) wristGripper += incWristGripper;
+    if (dirValue == HIGH && wristGripper < 180) wristGripper += incWristGripper;
+  }
     else {
       if(wristGripper >= incWristGripper) wristGripper -= incWristGripper;
     }
@@ -154,8 +156,14 @@ void updateXYZ() {
 
 void updateWrist() {
   if (sensorValue1 > wristAngThresh) {
-    if (dirValue == HIGH && wristAng <= 180-incWristAng) wristAng += incWristAng;
-    else if (wristAng >= incWristAng) wristAng -= incWristAng;
+    if (dirValue == HIGH && wristAng <= 180-incWristAng){
+      wristAng += incWristAng;
+      wristAngBelowHorizontal -=incWristAng;
+    }
+    else if (wristAng >= incWristAng){
+      wristAng -= incWristAng;
+      wristAngBelowHorizontal += incWristAng;
+    }
     pwm.setPWM(wristAngPort, 0, degreesToPulse(wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
   }   
   if (sensorValue2 > wristRotThresh) {
@@ -215,6 +223,7 @@ void moveToPosition(int x, int y, int z) {
   pwm.setPWM(basePort, 0, degreesToPulse(desiredDegrees[0], BASE_ROTATION_MIN, BASE_ROTATION_MAX));
   pwm.setPWM(shoulderPort, 0, degreesToPulse(desiredDegrees[1], SHOULDER_MIN, SHOULDER_MAX));
   pwm.setPWM(elbowPort, 0, degreesToPulse(desiredDegrees[2], ELBOW_MIN, ELBOW_MAX));
+  pwm.setPWM(wristAngPort,0,degreesToPulse(wristAng,WRIST_ANGLE_MIN,WRIST_ANGLE_MAX));
 }
 
 int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
@@ -224,31 +233,28 @@ int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
 
 void calculateDegrees (int x, int y, int z) {
   const float pi = 3.14159265259;
-  float phi = map(wristAng,WRIST_ANGLE_MIN,WRIST_ANGLE_MAX,1,179); // wrist angle we give, between end effector and line of forearm NEED TO KNOW WHAT 100 AND 585 LOOK LIKE ON THE WRIST!! UNSURE IF CODE WORKS THIS WAY
-  phi = phi*pi/180;
-  float r; // distance to end effector from base on base plane
-  float theta1;  // base angle
-  float theta2; // angle of the servo at the shoulder, from horizontal
-  float theta3; // angle of the servo at the elbow, between wrist and shoulder
-  r = sqrt(pow(x, 2.0) +pow(y, 2.0)); // pythagoras
-  theta1 = atan2(y,x); // trig
-  float length5 = sqrt(pow(ULNA,2.0) + pow(GRIPPER,2.0) - 2*ULNA*GRIPPER*cos(pi-phi)); // law of cosines to find the length from the wrist to the end effector
-  float phi2 = acos((pow(GRIPPER,2.0) - pow(length5,2.0) - pow(ULNA, 2.0))/(-2*length5*ULNA)); //angle from wrist-elbow-end effector
-  float length4 = sqrt(pow(r,2.0) + pow(z-BASE_HEIGHT,2.0)); // length from shoulder to end effector
-  theta3 = acos((pow(length4,2.0) - pow(length5,2.0) - pow(HUMERUS,2.0))/(-2*length5*HUMERUS)) - phi2; // elbow angle using law of cosines, correcting for the fact that the end effector placement angle is not the same as the elbow angle due to phiand ro being nonzero.
-  float theta4 = atan2(z-BASE_HEIGHT, r); // angle from horizontal to end effector
-  float theta5 = acos((pow(length5,2.0) - pow(HUMERUS,2.0) - pow(length4,2.0))/(-2*HUMERUS*length4)); // angle from theta4 to humerus
-  theta2 =theta4 +theta5; // adding to get theta 2
+  float alpha = wristAngBelowHorizontal * pi/180;
+  float r = sqrt(pow(x, 2.0) +pow(y, 2.0));
+  float theta1 = atan2(y,x); // trig
+  float length4 = sqrt(pow(r-GRIPPER*cos(alpha),2.0) + pow(z-BASE_HEIGHT-GRIPPER*cos(alpha),2.0)); // length from shoulder to wrist
+  float theta4 = atan2(z-BASE_HEIGHT-GRIPPER*sin(alpha), r-GRIPPER*cos(alpha)); // angle from horizontal to wrist
+  float theta5 = acos((pow(ULNA,2.0)-pow(HUMERUS,2.0) - pow(length4,2.0))/(-2*HUMERUS*length4));
+  float theta3 = acos((pow(length4,2.0) - pow(HUMERUS,2.0) - pow(HUMERUS,2.0))/(-2*HUMERUS*ULNA));
+  float theta6 = 180- theta5 - theta3;
+  float theta2 = theta5+ theta4;
+  float wristAngleFromUlna = theta6 + pi/2 -theta4 + pi/2 - alpha;
+  wristAngleFromUlna = wristAngleFromUlna*180/pi;  
   if (theta1 == NAN || theta2 == NAN || theta3 == NAN){
     return;
   }
   float theta1Deg = theta1/pi*180;
   float theta2Deg = theta2/pi*180;
   float theta3Deg = theta3/pi*180;
-  if (theta3Deg < 45) {
-    theta3Deg = 45;
+  if (theta3Deg < 5) {
+    theta3Deg = 5;
   }
   desiredDegrees[0] = theta1Deg; // desired base angle
   desiredDegrees[1] = theta2Deg; // desired shoulder angle
   desiredDegrees[2] = theta3Deg; // desired elbow angle
+  wristAng = 180 - wristAngleFromUlna;
 }

@@ -1,3 +1,18 @@
+Sunday, January 25th
+
+Goals for Today:
+
+- Test wrist angle and wrist gripper
+****** Clean up EMG signal
+- Get 3 EMGs
+
+- Kelsey: Redo block diagrams
+- Finish draft of poster
+- Possibly work on lightning talk presentation
+
+
+Saturday, January 24th
+
 XYZ = (0, 150, 60)
 desired degrees
 base 90
@@ -14,3 +29,6 @@ manual pulses
 200
 
 XYZ = (125, 125, 60)
+
+above threshold --> move
+dirButton --> move

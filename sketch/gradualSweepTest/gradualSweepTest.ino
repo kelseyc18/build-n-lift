@@ -121,13 +121,12 @@ void loop()
 
 void oneSensorMoveWrist() {
   if(sensorValue1 > wristGripperThresh){
-    if (dirValue == HIGH && wristGripper <= 180) wristGripper += incWristGripper;
-  }
+    if (dirValue == HIGH && wristGripper < 180) wristGripper += incWristGripper;
     else {
-      if(wristGripper >= incWristGripper) wristGripper -= incWristGripper;
+      if(wristGripper > incWristGripper) wristGripper -= incWristGripper;
     }
     pwm.setPWM(wristGripperPort, 0, degreesToPulse(wristGripper, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));// Open hand
-
+  }
 }
 
 void updateXYZ() {

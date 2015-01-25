@@ -34,10 +34,10 @@ const int velY = 5;
 const int velZ = 5;
 const int incWristAng = 5;
 const int incWristRot = 5;
-const int incWristGripper = 5;
+const int incWristGripper = 10;
 
 // AND THESE
-int xThresh = 300;
+int xThresh = 700;
 int yThresh = 300;
 int zThresh = 300;
 int wristAngThresh = 300;  // for wrist
@@ -105,24 +105,34 @@ void setup()
 void loop()
 {
   sensorValue1 = analogRead(analogInPin1);//Right Bicep
+  Serial.print("Sensor Value1: ");
+  Serial.println(sensorValue1);
   sensorValue2 = analogRead(analogInPin2);//Left Bicep
   sensorValue3 = analogRead(analogInPin3);//Forearm
   dirValue = digitalRead(dirPort);
+  Serial.print("dirValue: ");
+  Serial.println(dirValue);
   modeValue = digitalRead(modePort);
   
   // insert test method here
+  oneSensorMoveWrist();
   delay(1000);
 }
 
-void oneSensorMoveWrist(int sensorValue, int thresh) {
-  int initalWristAngle = 90;
-  int currentWristAngle = initalWristAngle;
-  int degIncrement = 5;
-  if(sensorValue > thresh){
-    if (dirValue == HIGH) currentWristAngle += degIncrement;
-    else currentWrist -= degIncrement;
-    pwm.setPWM(wristGripperPort, 0, degreesToPulse(180, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));// Open hand
-    pwm.setPWM(wristAngPort, 0, degreesToPulse(currentWristAngle, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));//Increase Wrist Angle
+void oneSensorMoveWrist() {
+//  if(sensorValue > thresh){
+//    if (dirValue == HIGH) wristAng += incWristAng;
+//    else wristAng -= incWristAng;
+//    pwm.setPWM(wristGripperPort, 0, degreesToPulse(180, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));// Open hand
+//    pwm.setPWM(wristAngPort, 0, degreesToPulse(wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));//Increase Wrist Angle
+//  }
+  if(sensorValue1 > wristGripperThresh){
+    if (dirValue == HIGH && wristGripper <= 180) wristGripper += incWristGripper;
+    else {
+      if(wristGripper >= incWristGripper) wristGripper -= incWristGripper;
+    }
+    pwm.setPWM(wristGripperPort, 0, degreesToPulse(wristGripper, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));// Open hand
+
   }
 }
 
@@ -145,13 +155,13 @@ void updateXYZ() {
 void updateWrist() {
   if (sensorValue1 > wristAngThresh) {
     wristAng += incWristAng;
-    pwm.setPWM(wristAngPort, 0, degreesToPulse(wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
+    pwm.setPWM(wristAngPort, 0, degreesToPulse(wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
   }
   if (sensorValue2 > wristRotThresh) {
     wristRot += incWristRot;
-    pwm.setPWM(wristRotPort, 0, degreesToPulse(wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX);
+    pwm.setPWM(wristRotPort, 0, degreesToPulse(wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX));
   }
-  if (sensorValue 3 > wristGripperThresh) {
+  if (sensorValue3 > wristGripperThresh) {
     if (dirValue == HIGH) pwm.setPWM(wristRotPort, 0, 500);
     else pwm.setPWM(wristRotPort, 0, 850);
   }

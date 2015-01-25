@@ -32,13 +32,17 @@ const int SHOULDER_MAX = 600; // Old 600
 const int velX = 5;
 const int velY = 5;
 const int velZ = 5;
-const int incWrist = 5;
+const int incWristAng = 5;
+const int incWristRot = 5;
+const int incWristGripper = 5;
 
 // AND THESE
 int xThresh = 300;
 int yThresh = 300;
 int zThresh = 300;
-int threshold = 300;  // for wrist
+int wristAngThresh = 300;  // for wrist
+int wristRotThresh = 300;
+int wristGripperThresh = 300;
 
 // Initialize output pins
 const int basePort = 0;
@@ -100,9 +104,7 @@ void setup()
 
 void loop()
 {
-
   sensorValue1 = analogRead(analogInPin1);//Right Bicep
-
   sensorValue2 = analogRead(analogInPin2);//Left Bicep
   sensorValue3 = analogRead(analogInPin3);//Forearm
   dirValue = digitalRead(dirPort);
@@ -116,46 +118,49 @@ void oneSensorMoveWrist(int sensorValue, int thresh) {
   int initalWristAngle = 90;
   int currentWristAngle = initalWristAngle;
   int degIncrement = 5;
-  pwm.setPWM
   if(sensorValue > thresh){
-    currentWristAngle += 5;
+    if (dirValue == HIGH) currentWristAngle += degIncrement;
+    else currentWrist -= degIncrement;
     pwm.setPWM(wristGripperPort, 0, degreesToPulse(180, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));// Open hand
     pwm.setPWM(wristAngPort, 0, degreesToPulse(currentWristAngle, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));//Increase Wrist Angle
-    }
-  else{
-    currentWristAngle -= 5;
-    pwm.setPWM(wristGripperPort, 0, degreesToPulse(0, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));// Close Hand
-    pwm.setPWM(wristAngPort, 0, degreesToPulse(currentWristAngle, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));// Decrease Wrist Angle
   }
-  
 }
 
-void updateXYZ(int rightBicepThresh, int leftBicepThresh, int forearmThresh int modeValue) {
-  // may need to change arguments
-  if(modeValue == HIGH){
-    //Moving one direction First
-    if(sensorValue1 > rightBicepThresh){
-      currentX += velX;
-      moveToPosition(currentX, currentY, currentZ);
+void updateXYZ() {
+  if(sensorValue1 > xThresh) {
+    if (dirValue == HIGH) currentX += velX;
+    else currentX -= velX;
   }
-  else{
-    currentX -= velX
-    moveToPosition(currentX, currentY, currentZ);
+  if(sensorValue2 > yThresh) {
+    if (dirValue == HIGH) currentY += velY;
+    else currentY -= velY;
   }
+  if(sensorValue3 > zThresh) {
+    if (dirValue == HIGH) currentZ += velZ;
+    else currentZ -= velZ;
+  }
+  moveToPosition(currentX, currentY, currentZ);
 }
 
 void updateWrist() {
-  // may need to change arguments
+  if (sensorValue1 > wristAngThresh) {
+    wristAng += incWristAng;
+    pwm.setPWM(wristAngPort, 0, degreesToPulse(wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX);
+  }
+  if (sensorValue2 > wristRotThresh) {
+    wristRot += incWristRot;
+    pwm.setPWM(wristRotPort, 0, degreesToPulse(wristRot, WRIST_ROT_MIN, WRIST_ROT_MAX);
+  }
+  if (sensorValue 3 > wristGripperThresh) {
+    if (dirValue == HIGH) pwm.setPWM(wristRotPort, 0, 500);
+    else pwm.setPWM(wristRotPort, 0, 850);
+  }
+  else pwm.setPWM(wristRotPort, 0, 0);
 } 
 
 void wholeShebang() {
-  // may need to change arguments
-
-
-  dirValue = digitalRead(dirPort);
-  Serial.println(sensorValue1);
-  threesixtyServo(sensorValue1, xThresh);
-
+  if (modeValue == HIGH) updateWrist();
+  else updateXYZ();
 }
 
 void threesixtyServo(int sensorValue, int thresh) {

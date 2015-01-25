@@ -138,6 +138,10 @@ void updateXYZ(int rightBicepThresh, int leftBicepThresh, int forearmThresh int 
       currentX += velX;
       moveToPosition(currentX, currentY, currentZ);
   }
+  else{
+    currentX -= velX
+    moveToPosition(currentX, currentY, currentZ);
+  }
 }
 
 void updateWrist() {

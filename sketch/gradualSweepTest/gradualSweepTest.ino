@@ -28,6 +28,19 @@ const int ELBOW_MAX = 100; // Old Number 500
 const int SHOULDER_MIN = 150; // Old 150
 const int SHOULDER_MAX = 600; // Old 600
 
+// CHANGE THESE
+const int velX = 5;
+const int velY = 5;
+const int velZ = 5;
+const int incWrist = 5;
+
+// AND THESE
+int xThresh = 300;
+int yThresh = 300;
+int zThresh = 300;
+int threshold = 300;  // for wrist
+
+// Initialize output pins
 const int basePort = 0;
 const int shoulderPort = 1;
 const int elbowPort = 2;
@@ -36,8 +49,12 @@ const int wristRotPort = 4;
 const int wristGripperPort = 5;
 
 const int analogInPin1 = A0;  	// Analog input pin that EMG-1 is attached to
-const int dirPort = 12;
+const int analogInPin2 = A1;	// Analog input pin that EMG-2 is attached to
+const int analogInPin3 = A2;	// Analog input pin that EMG-3 is attached to
+const int dirPort = 12;         // Digital input pin to toggle direction (positive or negative)
+const int modePort = 13;        // Digital input pin to toggle mode (xyz direction or wrist movement)
 
+// Wrist pulse lengths
 int wristAng = 150;
 int wristRot = 300;
 int wristGripper = 370;
@@ -47,12 +64,12 @@ int currentX = 0;
 int currentY = 150;
 int currentZ = 60;
 
-int velX = 5;
-int xThresh = 300;
-
 int dirValue;
+int modeValue;
 
 int sensorValue1;
+int sensorValue2;
+int sensorValue3;
 
 float desiredDegrees[] = {0, 0, 0};
 
@@ -65,17 +82,48 @@ void setup()
   pinMode(basePort, OUTPUT);
   pinMode(shoulderPort, OUTPUT);
   pinMode(elbowPort, OUTPUT);
+  pinMode(wristAngPort, OUTPUT);
+  pinMode(wristRotPort, OUTPUT);
+  pinMode(wristGripperPort, OUTPUT);
   
   pinMode(analogInPin1, INPUT);
+  pinMode(analogInPin2, INPUT);
+  pinMode(analogInPin3, INPUT);
   pinMode(dirPort, INPUT);
+  pinMode(modePort, INPUT);
+  
+  pwm.setPWM(wristAngPort, 0, degreesToPulse(90, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
+  pwm.setPWM(wristRotPort, 0, degreesToPulse(90, WRIST_ROT_MIN, WRIST_ROT_MAX));
+  pwm.setPWM(wristGripperPort, 0, degreesToPulse(90, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));
+  moveToPosition(currentX, currentY, currentZ);
 }
 
 void loop()
 {
   sensorValue1 = analogRead(analogInPin1);
+  sensorValue2 = analogRead(analogInPin2);
+  sensorValue3 = analogRead(analogInPin3);
   dirValue = digitalRead(dirPort);
-  Serial.println(sensorValue1);
-  thirtysixtyServo(sensorValue1, xThresh);
+  modeValue = digitalRead(modePort);
+  
+  // insert test method here
+  delay(1000);
+}
+
+void oneSensorMoveWrist(int sensorValue, int thresh) {
+  
+}
+
+void updateXYZ() {
+  // may need to change arguments
+}
+
+void updateWrist() {
+  // may need to change arguments
+} 
+
+void wholeShebang() {
+  // may need to change arguments
 }
 
 void threesixtyServo(int sensorValue, int thresh) {
@@ -91,13 +139,11 @@ void oneSensorMove(int sensorValue, int thresh) {
     currentX += velX;
   }
   moveToPosition(currentX, currentY, currentZ);
-  delay(1000);
 }
 
 void moveButton() {
   if (dirValue == HIGH) currentX += velX;
   moveToPosition(currentX, currentY, currentZ);
-  delay(1000);
 }
 
 void sweep() {

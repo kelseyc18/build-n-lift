@@ -36,6 +36,16 @@ int wristAng = 150;
 int wristRot = 300;
 int wristGripper = 370;
 
+// Current XYZ position
+int currentX = 0;
+int currentY = 150;
+int currentZ = 60;
+
+int velX = 5;
+
+const int dirPort = 12;
+int dirValue;
+
 float desiredDegrees[] = {0, 0, 0};
 
 void setup()
@@ -47,19 +57,30 @@ void setup()
   pinMode(basePort, OUTPUT);
   pinMode(shoulderPort, OUTPUT);
   pinMode(elbowPort, OUTPUT);
+  pinMode(dirPort, INPUT);
 }
 
 void loop()
 {
-//  for (int deg = 0; deg <= 180; deg += 45)
-//  {
-//    pwm.setPWM(elbowPort, 0, degreesToPulse(deg, ELBOW_MIN, ELBOW_MAX));
-//    Serial.println(deg);
-//    Serial.println(degreesToPulse(deg, ELBOW_MIN, ELBOW_MAX));
-//    Serial.println();
-//    delay(1000);
-//  }
-  moveToPosition(0, 150, 60);
+  dirValue = digitalRead(dirPort);
+  moveButton();
+}
+
+void moveButton() {
+  if (dirValue == HIGH) currentX += velX;
+  moveToPosition(currentX, currentY, currentZ);
+  delay(1000);
+}
+
+void sweep() {
+  for (int deg = 0; deg <= 180; deg += 45)
+  {
+    pwm.setPWM(elbowPort, 0, degreesToPulse(deg, ELBOW_MIN, ELBOW_MAX));
+    Serial.println(deg);
+    Serial.println(degreesToPulse(deg, ELBOW_MIN, ELBOW_MAX));
+    Serial.println();
+    delay(1000);
+  }
 }
 
 void moveToPosition(int x, int y, int z) {

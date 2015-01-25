@@ -59,7 +59,7 @@ const int dirPort = 12;         // Digital input pin to toggle direction (positi
 const int modePort = 13;        // Digital input pin to toggle mode (xyz direction or wrist movement)
 
 
-
+int wristAng = 0;
 int wristAngBelowHorizontal = 90; //when wristAng = 0 and ulna is horizontal, this equals 90
 int wristRot = 90;
 int wristGripper = 90;
@@ -125,11 +125,10 @@ void oneSensorMoveWrist() {
     if (dirValue == HIGH && wristGripper < 180) wristGripper += incWristGripper;
   }
     else {
-      if(wristGripper >= incWristGripper) wristGripper -= incWristGripper;
+      if(wristGripper > incWristGripper) wristGripper -= incWristGripper;
     }
     pwm.setPWM(wristGripperPort, 0, degreesToPulse(wristGripper, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));// Open hand
-
-}
+  }
 
 void updateXYZ() {
   if(sensorValue1 > xThresh) {
@@ -237,7 +236,7 @@ void calculateDegrees (int x, int y, int z) {
   float theta2 = theta5+ theta4;
   float wristAngleFromUlna = theta6 + pi/2 -theta4 + pi/2 - alpha;
   wristAngleFromUlna = wristAngleFromUlna*180/pi;  
-  if (theta1 == NAN || theta2 == NAN || theta3 == NAN || wristAngleFromUlna > 270 || WristAngleFromUlna < 90){
+  if (theta1 == NAN || theta2 == NAN || theta3 == NAN || wristAngleFromUlna > 270 || wristAngleFromUlna < 90){
     return;
   }
   float theta1Deg = theta1/pi*180;

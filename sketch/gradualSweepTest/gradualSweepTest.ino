@@ -32,9 +32,9 @@ const int SHOULDER_MAX = 600; // Old 600
 const int velX = 5;
 const int velY = 5;
 const int velZ = 5;
-const int incWristAng = 5;
-const int incWristRot = 5;
-const int incWristGripper = 10;
+const int incWristAng = 2;
+const int incWristRot = 2;
+const int incWristGripper = 5;
 
 // AND THESE
 int xThresh = 700;
@@ -240,11 +240,11 @@ void calculateDegrees (int x, int y, int z) {
   float theta4 = atan2(z-BASE_HEIGHT-GRIPPER*sin(alpha), r-GRIPPER*cos(alpha)); // angle from horizontal to wrist
   float theta5 = acos((pow(ULNA,2.0)-pow(HUMERUS,2.0) - pow(length4,2.0))/(-2*HUMERUS*length4));
   float theta3 = acos((pow(length4,2.0) - pow(HUMERUS,2.0) - pow(HUMERUS,2.0))/(-2*HUMERUS*ULNA));
-  float theta6 = 180- theta5 - theta3;
+  float theta6 = pi- theta5 - theta3;
   float theta2 = theta5+ theta4;
   float wristAngleFromUlna = theta6 + pi/2 -theta4 + pi/2 - alpha;
   wristAngleFromUlna = wristAngleFromUlna*180/pi;  
-  if (theta1 == NAN || theta2 == NAN || theta3 == NAN){
+  if (theta1 == NAN || theta2 == NAN || theta3 == NAN || wristAngleFromUlna > 270 || WristAngleFromUlna < 90){
     return;
   }
   float theta1Deg = theta1/pi*180;
@@ -256,5 +256,5 @@ void calculateDegrees (int x, int y, int z) {
   desiredDegrees[0] = theta1Deg; // desired base angle
   desiredDegrees[1] = theta2Deg; // desired shoulder angle
   desiredDegrees[2] = theta3Deg; // desired elbow angle
-  wristAng = 180 - wristAngleFromUlna;
+  wristAng = wristAngleFromUlna -90;
 }

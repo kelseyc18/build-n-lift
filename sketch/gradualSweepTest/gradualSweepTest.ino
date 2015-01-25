@@ -101,10 +101,10 @@ void setup()
 void loop()
 {
 
-  sensorValue1 = analogRead(analogInPin1);
+  sensorValue1 = analogRead(analogInPin1);//Right Bicep
 
-  sensorValue2 = analogRead(analogInPin2);
-  sensorValue3 = analogRead(analogInPin3);
+  sensorValue2 = analogRead(analogInPin2);//Left Bicep
+  sensorValue3 = analogRead(analogInPin3);//Forearm
   dirValue = digitalRead(dirPort);
   modeValue = digitalRead(modePort);
   
@@ -130,8 +130,14 @@ void oneSensorMoveWrist(int sensorValue, int thresh) {
   
 }
 
-void updateXYZ() {
+void updateXYZ(int rightBicepThresh, int leftBicepThresh, int forearmThresh int modeValue) {
   // may need to change arguments
+  if(modeValue == HIGH){
+    //Moving one direction First
+    if(sensorValue1 > rightBicepThresh){
+      currentX += velX;
+      moveToPosition(currentX, currentY, currentZ);
+  }
 }
 
 void updateWrist() {

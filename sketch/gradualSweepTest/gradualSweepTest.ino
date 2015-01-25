@@ -75,7 +75,7 @@ void loop()
   sensorValue1 = analogRead(analogInPin1);
   dirValue = digitalRead(dirPort);
   Serial.println(sensorValue1);
-  oneSensorMove(sensorValue1, xThresh);
+  thirtysixtyServo(sensorValue1, xThresh);
 }
 
 void threesixtyServo(int sensorValue, int thresh) {

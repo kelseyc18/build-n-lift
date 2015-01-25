@@ -129,6 +129,7 @@ void oneSensorMoveWrist() {
 //  }
   if(sensorValue1 > wristGripperThresh){
     if (dirValue == HIGH && wristGripper <= 180) wristGripper += incWristGripper;
+  }
     else {
       if(wristGripper >= incWristGripper) wristGripper -= incWristGripper;
     }

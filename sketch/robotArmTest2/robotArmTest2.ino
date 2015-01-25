@@ -214,13 +214,10 @@ void moveToPosition(int x, int y, int z) {
   currentY = y;
   currentZ = z;
   calculateDegrees(x, y, z); // updates desiredDegrees
-  int baseRotation = 0;
-  int shoulderRotation = 1;
-  int elbowRotation = 2;
   jointAnglesToServoAngles(desiredDegrees[0],desiredDegrees[1],desiredDegrees[2]);
   pwm.setPWM(basePort, 0, degreesToPulse(servoAngles[0], BASE_ROTATION_MIN, BASE_ROTATION_MAX));
-   pwm.setPWM(shoulderPort, 0, degreesToPulse(servoAngles[1], SHOULDER_MIN, SHOULDER_MAX));
-   pwm.setPWM(elbowPort, 0, degreesToPulse(servoAngles[2], ELBOW_MIN, ELBOW_MAX));
+  pwm.setPWM(shoulderPort, 0, degreesToPulse(servoAngles[1], SHOULDER_MIN, SHOULDER_MAX));
+  pwm.setPWM(elbowPort, 0, degreesToPulse(servoAngles[2], ELBOW_MIN, ELBOW_MAX));
 }
 
 /*

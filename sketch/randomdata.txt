@@ -1,0 +1,16 @@
+XYZ = (0, 150, 60)
+desired degrees
+base 90
+shoulder 147.51
+elbow 45
+
+base 375
+shoulder 517
+elbow 237
+
+manual pulses
+375
+428
+200
+
+XYZ = (125, 125, 60)

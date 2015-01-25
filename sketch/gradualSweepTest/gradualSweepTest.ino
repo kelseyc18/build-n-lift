@@ -58,8 +58,8 @@ const int analogInPin3 = A2;	// Analog input pin that EMG-3 is attached to
 const int dirPort = 12;         // Digital input pin to toggle direction (positive or negative)
 const int modePort = 13;        // Digital input pin to toggle mode (xyz direction or wrist movement)
 
-// Wrist pulse lengths
-int wristAng = 0;
+
+
 int wristAngBelowHorizontal = 90; //when wristAng = 0 and ulna is horizontal, this equals 90
 int wristRot = 90;
 int wristGripper = 90;

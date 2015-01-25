@@ -70,6 +70,13 @@ void loop(){
   int sweep_pulselength = degreesToPulse(0, BASE_ROTATION_MIN, BASE_ROTATION_MAX);
   pwm.setPWM(servo_test_port, 0, 630); // 0 degrees
   
+  pwm.setPWM(4,0, 500);
+  delay(1000);
+  pwm.setPWM(4,0,0);
+  delay(1000);
+  //pwm.setPWM(4,0, 850);
+ // delay(500);
+  
  
   }
   

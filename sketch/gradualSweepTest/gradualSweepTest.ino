@@ -16,13 +16,15 @@ const int WRIST_GRIPPER_MAX = 600;
 const int WRIST_ROT_MIN = 200; //guess
 const int WRIST_ROT_MAX = 400; // guess
 
-const int ELBOW_MIN = 100; // corrected
-const int ELBOW_MAX = 650; 
+const int ELBOW_MIN = 500; // corrected Old Min 100
+const int ELBOW_MAX = 100; // Old Number 500
 
-const int SHOULDER_MIN = 150; // guess
-const int SHOULDER_MAX = 600; // guess
+const int SHOULDER_MIN = 150; // Old 150
+const int SHOULDER_MAX = 600; // Old 600
 
-const int servoPort = 0;
+const int basePort = 0;
+const int shoulderPort = 1;
+const int elbowPort = 2;
 
 void setup()
 {
@@ -30,21 +32,27 @@ void setup()
   pwm.begin();
   pwm.setPWMFreq(60);
   
-  pinMode(servoPort, OUTPUT);
-
-  pwm.setPWM(servoPort, 0, degreesToPulse(0, SHOULDER_MIN, SHOULDER_MAX));
+  pinMode(basePort, OUTPUT);
+  pinMode(shoulderPort, OUTPUT);
+  pinMode(elbowPort, OUTPUT);
 }
 
 void loop()
 {
-  for (int deg = 0; deg <= 180; deg += 10)
-  {
-    pwm.setPWM(servoPort, 0, degreesToPulse(deg, SHOULDER_MIN, SHOULDER_MAX));
-    Serial.println(deg);
-    Serial.println(degreesToPulse(deg, SHOULDER_MIN, SHOULDER_MAX));
-    Serial.println();
-    delay(1000);
-  }
+//  for (int deg = 0; deg <= 180; deg += 45)
+//  {
+//    pwm.setPWM(elbowPort, 0, degreesToPulse(deg, ELBOW_MAX, ELBOW_MIN));
+//    Serial.println(deg);
+//    Serial.println(degreesToPulse(deg, ELBOW_MAX, ELBOW_MIN));
+//    Serial.println();
+//    delay(1000);
+//  }
+  pwm.setPWM(basePort, 0, degreesToPulse(135,BASE_ROTATION_MIN,BASE_ROTATION_MAX));
+  delay(1000);
+  pwm.setPWM(shoulderPort, 0, degreesToPulse(122,SHOULDER_MIN, SHOULDER_MAX));
+  delay(1000);
+  pwm.setPWM(elbowPort, 0, degreesToPulse(45,ELBOW_MIN,ELBOW_MAX));
+  delay(1000);
 }
 
 int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){

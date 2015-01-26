@@ -228,10 +228,10 @@ void calculateDegrees (int x, int y, int z) {
   float alpha = wristAngBelowHorizontal * pi/180;
   float r = sqrt(pow(x, 2.0) +pow(y, 2.0));
   float theta1 = atan2(y,x); // trig
-  float length4 = sqrt(pow(r-GRIPPER*cos(alpha),2.0) + pow(z-BASE_HEIGHT-GRIPPER*cos(alpha),2.0)); // length from shoulder to wrist
-  float theta4 = atan2(z-BASE_HEIGHT-GRIPPER*sin(alpha), r-GRIPPER*cos(alpha)); // angle from horizontal to wrist
+  float length4 = sqrt(pow(r-GRIPPER*cos(alpha),2.0) + pow(z-BASE_HEIGHT+GRIPPER*cos(alpha),2.0)); // length from shoulder to wrist
+  float theta4 = atan2(z-BASE_HEIGHT+GRIPPER*sin(alpha), r-GRIPPER*cos(alpha)); // angle from horizontal to wrist
   float theta5 = acos((pow(ULNA,2.0)-pow(HUMERUS,2.0) - pow(length4,2.0))/(-2*HUMERUS*length4));
-  float theta3 = acos((pow(length4,2.0) - pow(HUMERUS,2.0) - pow(HUMERUS,2.0))/(-2*HUMERUS*ULNA));
+  float theta3 = acos((pow(length4,2.0) - pow(HUMERUS,2.0) - pow(ULNA,2.0))/(-2*HUMERUS*ULNA));
   float theta6 = pi- theta5 - theta3;
   float theta2 = theta5+ theta4;
   float wristAngleFromUlna = theta6 + pi/2 -theta4 + pi/2 - alpha;

@@ -59,8 +59,8 @@ const int dirPort = 12;         // Digital input pin to toggle direction (positi
 const int modePort = 13;        // Digital input pin to toggle mode (xyz direction or wrist movement)
 
 
-int wristAng = 0;
-int wristAngBelowHorizontal = 90; //when wristAng = 0 and ulna is horizontal, this equals 90
+int wristAng = 90;
+int wristAngBelowHorizontal = 0; //when wristAng = 0 and ulna is horizontal, this equals 90
 int wristRot = 90;
 int wristGripper = 90;
 
@@ -97,7 +97,7 @@ void setup()
   pinMode(dirPort, INPUT);
   pinMode(modePort, INPUT);
   
-  pwm.setPWM(wristAngPort, 0, degreesToPulse(90, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
+  pwm.setPWM(wristAngPort, 0, degreesToPulse(wristAng, WRIST_ANGLE_MIN, WRIST_ANGLE_MAX));
   pwm.setPWM(wristRotPort, 0, degreesToPulse(90, WRIST_ROT_MIN, WRIST_ROT_MAX));
   pwm.setPWM(wristGripperPort, 0, degreesToPulse(90, WRIST_GRIPPER_MIN, WRIST_GRIPPER_MAX));
   moveToPosition(currentX, currentY, currentZ);
@@ -105,19 +105,31 @@ void setup()
 
 void loop()
 {
-  sensorValue1 = analogRead(analogInPin1);//Right Bicep
-  Serial.print("Sensor Value1: ");
-  Serial.println(sensorValue1);
+  sensorValue1 = analogRead(analogInPin1); //Right Bicep
+//  Serial.print("Sensor Value1: ");
+//  Serial.println(sensorValue1);
   sensorValue2 = analogRead(analogInPin2);//Left Bicep
   sensorValue3 = analogRead(analogInPin3);//Forearm
   dirValue = digitalRead(dirPort);
-  Serial.print("dirValue: ");
-  Serial.println(dirValue);
+//  Serial.print("dirValue: ");
+//  Serial.println(dirValue);
   modeValue = digitalRead(modePort);
   
   // insert test method here
-  oneSensorMoveWrist();
+  moveToPosition(0, 150, 150);
   delay(1000);
+}
+
+void printDesiredDegrees() {
+  Serial.print("baseAngle = ");
+  Serial.println(desiredDegrees[0]);
+  Serial.print("shoulderAngle = ");
+  Serial.println(desiredDegrees[1]);
+  Serial.print("elbowAngle = ");
+  Serial.println(desiredDegrees[2]);
+  Serial.print("wristAngle = ");
+  Serial.println(wristAng);
+  Serial.println();
 }
 
 void oneSensorMoveWrist() {
@@ -220,6 +232,7 @@ void moveToPosition(int x, int y, int z) {
 
 int degreesToPulse(int angle_Degree, int pulseMin, int pulseMax){
   int pulse_length = map(angle_Degree, 0, 180, pulseMin, pulseMax);
+  Serial.println(pulse_length);
   return pulse_length;
 }
 
@@ -233,10 +246,11 @@ void calculateDegrees (int x, int y, int z) {
   float theta5 = acos((pow(ULNA,2.0)-pow(HUMERUS,2.0) - pow(length4,2.0))/(-2*HUMERUS*length4));
   float theta3 = acos((pow(length4,2.0) - pow(HUMERUS,2.0) - pow(ULNA,2.0))/(-2*HUMERUS*ULNA));
   float theta6 = pi- theta5 - theta3;
-  float theta2 = theta5+ theta4;
+  float theta2 = theta5 + theta4;
   float wristAngleFromUlna = theta6 + pi/2 -theta4 + pi/2 - alpha;
   wristAngleFromUlna = wristAngleFromUlna*180/pi;  
   if (theta1 == NAN || theta2 == NAN || theta3 == NAN || wristAngleFromUlna > 270 || wristAngleFromUlna < 90){
+    Serial.print("NAN");
     return;
   }
   float theta1Deg = theta1/pi*180;
